@@ -253,7 +253,12 @@ async function iS(){
   }).join('');
 }
 async function iB(){const p=await ld('Blog');const v=p.filter(p=>p.visible&&p.visible.toString().toLowerCase()==='si');if(!v.length)return;document.getElementById('blog-section').style.display='block';document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');}
-async function init(){await Promise.all([iC(),iT(),iS(),iB()]);}init();
+async function init(){
+  await iC().catch(console.error);
+  await iT().catch(console.error);
+  await iS().catch(console.error);
+  await iB().catch(console.error);
+};
 function sel(el){document.querySelectorAll('.nd').forEach(n=>n.classList.remove('on'));el.classList.add('on');const s=el.dataset.s;if(!s)return;if(s==='halion'){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('halion-section').scrollIntoView({behavior:'smooth',block:'start'});return;}document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));const panel=document.getElementById('p-'+s);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}}
 function openModal(){document.getElementById('modal').classList.add('show');}function closeModal(){document.getElementById('modal').classList.remove('show');}function sendForm(){alert('¡Gracias! Te contactaremos pronto.');closeModal();}document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 function sel2(s){sel(document.querySelector('.nd[data-s="'+s+'"]')||document.createElement('div'));}
