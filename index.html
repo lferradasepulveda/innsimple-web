@@ -207,13 +207,49 @@ const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-a
 Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});}
 async function iS(){
   const s = await ld('Servicios');
-  const v = s.filter(s => String(s.visible||'').toLowerCase().trim() === 'si');
+  console.log('Servicios raw:', s);
+
+  const v = s.filter(row =>
+    ['si','sí','true','1'].includes(
+      String(row.visible || '').trim().toLowerCase()
+    )
+  );
+
+  console.log('Servicios visibles:', v);
+
   const g = document.getElementById('svc-grid');
-  if(!g || !v.length) return;
-  const cl=[{b:'var(--teal-l)',f:'var(--teal)'},{b:'var(--copper-l)',f:'var(--copper)'},{b:'rgba(26,138,72,.06)',f:'var(--green)'},{b:'rgba(34,96,212,.06)',f:'var(--blue)'},{b:'rgba(160,120,24,.06)',f:'var(--gold)'},{b:'rgba(208,90,24,.06)',f:'var(--orange)'}];
-  g.innerHTML=v.map((s,i)=>{
-    const c=cl[i%cl.length];
-    return`<div class="svc"><div class="svc-icon" style="background:${c.b};color:${c.f};">${s.icono||'◆'}</div><h3>${s.nombre}</h3><p>${s.descripcion}</p><div class="svc-tag">${s.modelo_cobro||''}</div></div>`;
+
+  if(!g){
+    console.error('No existe #svc-grid');
+    return;
+  }
+
+  if(!v.length){
+    g.innerHTML = '<p style="color:red;">No hay servicios visibles en la hoja.</p>';
+    return;
+  }
+
+  const cl = [
+    {b:'var(--teal-l)',f:'var(--teal)'},
+    {b:'var(--copper-l)',f:'var(--copper)'},
+    {b:'rgba(26,138,72,.06)',f:'var(--green)'},
+    {b:'rgba(34,96,212,.06)',f:'var(--blue)'},
+    {b:'rgba(160,120,24,.06)',f:'var(--gold)'},
+    {b:'rgba(208,90,24,.06)',f:'var(--orange)'}
+  ];
+
+  g.innerHTML = v.map((row,i)=>{
+    const c = cl[i % cl.length];
+    return `
+      <div class="svc">
+        <div class="svc-icon" style="background:${c.b};color:${c.f};">
+          ${row.icono || '◆'}
+        </div>
+        <h3>${row.nombre || 'Sin nombre'}</h3>
+        <p>${row.descripcion || ''}</p>
+        <div class="svc-tag">${row.modelo_cobro || ''}</div>
+      </div>
+    `;
   }).join('');
 }
 async function iB(){const p=await ld('Blog');const v=p.filter(p=>p.visible&&p.visible.toString().toLowerCase()==='si');if(!v.length)return;document.getElementById('blog-section').style.display='block';document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');}
