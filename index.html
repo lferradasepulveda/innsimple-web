@@ -167,7 +167,30 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <script>
 const SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
 const sU=t=>`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
-function ps(x){const j=JSON.parse(x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]);const c=j.table.cols.map(c=>(c.label||'').trim().toLowerCase().replace(/\s+/g,'_'));return j.table.rows.map(r=>{const o={};r.c.forEach((v,i)=>{o[c[i]]=v?(v.v||''):'';});return o;});}
+function ps(x){
+  const j = JSON.parse(
+    x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
+  );
+
+  if(!j.table.rows.length) return [];
+
+  // Primera fila = encabezados reales
+  const headers = j.table.rows[0].c.map(h =>
+    String(h?.v || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+  );
+
+  // Desde la segunda fila = datos
+  return j.table.rows.slice(1).map(r => {
+    const o = {};
+    headers.forEach((h, i) => {
+      o[h] = r.c[i]?.v ?? '';
+    });
+    return o;
+  });
+}
 async function ld(t){try{const r=await fetch(sU(t));return ps(await r.text());}catch(e){console.error(t,e);return[];}}
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
 function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="openModal()">Solicitar info →</button></div>`;}
