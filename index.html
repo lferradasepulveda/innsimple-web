@@ -220,11 +220,15 @@ Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])
 async function iS(){
   const s = await ld('Servicios');
 
+  console.log("SERVICIOS RAW:", s);
+
   const v = s.filter(row =>
     ['si','sí','true','1'].includes(
       String(row.visible || '').trim().toLowerCase()
     )
   );
+
+  console.log("SERVICIOS FILTRADOS:", v);
 
   const g = document.getElementById('svc-grid');
   if(!g) return;
@@ -242,7 +246,9 @@ async function iS(){
 
     return `
       <div class="svc">
-        <div class="svc-icon" style="background:${c.b};color:${c.f};">◆</div>
+        <div class="svc-icon" style="background:${c.b};color:${c.f};">
+          ${row.icono || '◆'}
+        </div>
         <h3>${row.nombre || ''}</h3>
         <p>${row.descripcion || ''}</p>
         <div class="svc-tag">${row.modelo_cobro || '-'}</div>
