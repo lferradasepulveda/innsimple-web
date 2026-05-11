@@ -174,32 +174,41 @@ function ps(x){
 
   if(!j.table || !j.table.rows || !j.table.rows.length) return [];
 
-  // Headers reales desde cols
-  const headers = j.table.cols.map(col =>
+  let headers = j.table.cols.map(col =>
     String(col.label || col.id || '')
       .trim()
       .toLowerCase()
       .replace(/\s+/g, '_')
   );
 
-  // Filas reales
+  // Si Google devuelve a,b,c... usamos primera fila como headers reales
+  const genericHeaders = headers.every(h => /^[a-z]$/.test(h));
+
+  if (genericHeaders) {
+    headers = j.table.rows[0].c.map(cell =>
+      String(cell?.v || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+    );
+
+    return j.table.rows.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((header, i) => {
+        const cell = row.c[i];
+        obj[header] = cell?.v ?? cell?.f ?? '';
+      });
+      return obj;
+    });
+  }
+
+  // Caso normal
   return j.table.rows.map(row => {
     const obj = {};
-
     headers.forEach((header, i) => {
       const cell = row.c[i];
-
-      if (!cell) {
-        obj[header] = '';
-      } else if (cell.v !== undefined && cell.v !== null) {
-        obj[header] = String(cell.v).trim();
-      } else if (cell.f !== undefined && cell.f !== null) {
-        obj[header] = String(cell.f).trim();
-      } else {
-        obj[header] = '';
-      }
+      obj[header] = cell?.v ?? cell?.f ?? '';
     });
-
     return obj;
   });
 }
