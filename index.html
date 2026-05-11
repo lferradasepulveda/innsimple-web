@@ -34,27 +34,130 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <section class="hero"><div class="hero-tag" id="hero-tag">◆ Transferencia Tecnológica para Minería</div><h1 id="hero-h1">Conectamos <span class="acc">innovación</span> con operaciones mineras</h1><p id="hero-p">Evaluamos, seleccionamos y facilitamos la adopción de tecnologías emergentes para el procesamiento de minerales.</p></section>
 <div class="tabs" id="flow"><button class="tab on">Cobre</button><button class="tab soon">Litio — pronto</button><button class="tab soon">Oro — pronto</button></div>
 <div class="flow-wrap"><div class="flow-title" id="flow-title">Cadena de proceso del cobre — selecciona una etapa</div>
-<div class="fr"><div class="nd nd-common" data-s="chancado" onclick="sel(this)"><div class="nd-box">Conminución</div><div class="nd-badge">3 techs</div></div></div>
-<div class="routes">
-<div class="route-col"><div class="route-label pyro">RUTA PIROMETALÚRGICA</div><div class="fr"><div class="nd nd-pyro" data-s="flotacion" onclick="sel(this)"><div class="nd-box">Flotación</div><div class="nd-badge">2 techs</div></div><div class="arr"></div><div class="nd nd-pyro" data-s="fundicion" onclick="sel(this)"><div class="nd-box">Fundición</div></div><div class="arr"></div><div class="nd nd-pyro" data-s="eref" onclick="sel(this)"><div class="nd-box">Electro-<br>refinación</div></div><div class="arr"></div><div class="nd nd-product"><div class="nd-box">Metal</div></div></div></div>
-<div class="route-col"><div class="route-label hydro">RUTA HIDROMETALÚRGICA</div><div class="fr"><div class="nd nd-hydro" data-s="lix-ac" onclick="sel(this)"><div class="nd-box">Lixiviación<br>Ácida</div><div class="nd-badge">2 techs</div></div><div class="arr"></div><div class="nd nd-hydro" data-s="sx" onclick="sel(this)"><div class="nd-box">SX</div></div><div class="arr"></div><div class="nd nd-hydro" data-s="ew" onclick="sel(this)"><div class="nd-box">EW</div><div class="nd-badge">2 techs</div></div><div class="arr"></div><div class="nd nd-product"><div class="nd-box">Cátodos Cu</div></div></div>
-<div style="margin-top:.4rem;"><div class="fr"><div class="nd nd-hydro" data-s="bio" onclick="sel(this)" style="opacity:.8"><div class="nd-box" style="min-width:78px;height:38px;font-size:.55rem">Bio-lixiviación</div><div class="nd-badge">2 techs</div></div><div style="flex:0 0 auto;width:14px;padding-bottom:14px;color:#c0c8d4;font-size:.55rem;text-align:center">↗</div><div class="nd nd-hydro" data-s="ix" onclick="sel(this)" style="opacity:.7"><div class="nd-box" style="min-width:60px;height:34px;font-size:.52rem">IX</div></div><div style="flex:0 0 auto;width:14px;padding-bottom:14px;color:#c0c8d4;font-size:.55rem;text-align:center">→</div><div class="nd nd-hydro" data-s="precip" onclick="sel(this)" style="opacity:.7"><div class="nd-box" style="min-width:72px;height:34px;font-size:.52rem">Precipitación</div></div></div></div></div></div>
-<div style="margin-top:.5rem"><div class="route-label emerging">RUTA EMERGENTE — Nuestra oferta</div><div class="fr"><div class="nd nd-halion on" data-s="halion" onclick="sel(this)"><div class="nd-box" style="min-width:120px">Lixiviación<br>de Sulfuros</div><div class="nd-badge offer">Pilotaje en Chile</div></div><div style="flex:0 0 auto;width:30px;padding-bottom:18px;display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:.55rem;font-family:'IBM Plex Mono'">◆◆◆</div><div class="nd nd-hydro" data-s="relaves" onclick="sel(this)"><div class="nd-box" style="min-width:100px">Relaves /<br>Econ. Circular</div><div class="nd-badge hot">4 techs</div></div></div></div>
-<div class="legend"><div class="leg"><div class="leg-d" style="background:var(--common)"></div>Común</div><div class="leg"><div class="leg-d" style="background:var(--pyro)"></div>Pirometalurgia</div><div class="leg"><div class="leg-d" style="background:var(--hydro)"></div>Hidrometalurgia</div><div class="leg"><div class="leg-d" style="background:var(--teal)"></div>Piloteable</div></div></div>
-<div class="feat" id="halion-section"><div class="h-card"><div class="h-top"><div><h2 id="h-title">Lixiviación de sulfuros con <span>haluros mixtos</span></h2><div class="h-sub" id="h-sub">Procesamiento hidrometalúrgico de concentrados de sulfuros de cobre a presión atmosférica. Innsimple ofrece gestión integral del pilotaje en Chile.</div></div><div class="trl-t" id="h-trl">TRL 5–7</div></div><div class="h-grid" id="h-stats"><div class="h-st"><div class="v">>99%</div><div class="l">Extracción Cu desde calcopirita (4-6 hrs)</div></div><div class="h-st"><div class="v cu">97%</div><div class="l">Cu desde enargita (8% As) → escorodita</div></div><div class="h-st"><div class="v au">97%</div><div class="l">Au desde pirita — sin cianuración</div></div><div class="h-st"><div class="v">–70%</div><div class="l">Energía EW vs convencional</div></div></div><div class="h-desc" id="h-desc">Lixiviación contracorriente en 3 etapas con NaCl+NaBr, seguida de electroobtención directa desde Cu(I) sin SX. Opera a &lt;100°C. Recupera Cu, Au, Ag, Co, PGMs y REEs.</div><div class="h-tags" id="h-tags"><div class="h-tag">Presión atmosférica</div><div class="h-tag">T° &lt; 100°C</div><div class="h-tag">Sin SX</div><div class="h-tag">Sin cianuración</div><div class="h-tag">As → escorodita</div><div class="h-tag">Cero emisiones</div></div><button class="h-cta" id="h-cta" onclick="openModal()">Solicitar evaluación de compatibilidad →</button></div></div>
-<div class="detail">
-<div class="panel" id="p-chancado"><div class="p-hd"><h2>Conminución: <span>Chancado y Molienda</span></h2><div class="p-sub">La molienda consume ~50% de la energía total de una planta concentradora.</div><div class="conv">Convencional: SAG + Molinos de bolas</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-flotacion"><div class="p-hd"><h2><span>Flotación</span></h2><div class="p-sub">Separación de minerales de cobre de la ganga por diferencias de hidrofobicidad.</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-bio"><div class="p-hd"><h2><span>Biolixiviación</span></h2><div class="p-sub">Microorganismos que disuelven sulfuros.</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-lix-ac"><div class="p-hd"><h2>Lixiviación <span>Ácida</span></h2><div class="p-sub">H₂SO₄ en pilas para óxidos de cobre.</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-ew"><div class="p-hd"><h2><span>Electroobtención</span></h2><div class="p-sub">Chile tiene 38% de capacidad EW subutilizada.</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-relaves"><div class="p-hd"><h2>Relaves y <span>Economía Circular</span></h2><div class="p-sub">Chile tiene 796 depósitos de relaves con metales recuperables.</div></div><div class="t-list"></div></div>
-<div class="panel" id="p-fundicion"><div class="p-hd"><h2><span>Fundición</span></h2><div class="p-sub">Proceso pirometalúrgico convencional. ~70% del concentrado se exporta.</div></div></div>
-<div class="panel" id="p-eref"><div class="p-hd"><h2><span>Electrorefinación</span></h2><div class="p-sub">Purificación electrolítica. Cátodos 99.99% Cu.</div></div></div>
-<div class="panel" id="p-sx"><div class="p-hd"><h2>Extracción por <span>Solventes (SX)</span></h2><div class="p-sub">Purificación con extractantes orgánicos.</div></div></div>
-<div class="panel" id="p-ix"><div class="p-hd"><h2>Intercambio <span>Iónico (IX)</span></h2><div class="p-sub">Resinas selectivas para Au, Ag, Co, PGMs.</div></div></div>
-<div class="panel" id="p-precip"><div class="p-hd"><h2><span>Precipitación</span></h2><div class="p-sub">Separación selectiva de metales por pH.</div></div></div>
-<div class="panel" id="p-mantenimiento"><div class="p-hd"><h2><span>Mantenimiento Predictivo</span></h2><div class="p-sub">Tecnologías para anticipar fallas y optimizar disponibilidad de equipos.</div></div><div class="t-list"></div></div>
+
+  <div style="width:100%; overflow-x:auto; margin: 0.5rem 0 1rem;">
+<svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg" style="font-family:'DM Sans',sans-serif; min-width:480px;">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .nd-svg { cursor:pointer; }
+      .nd-svg:hover rect { opacity:0.82; }
+      .nd-svg rect { transition: opacity .2s; }
+      .th-svg { font-size:13px; font-weight:600; fill:#141c2b; }
+      .ts-svg { font-size:11px; font-weight:400; fill:#6d7a8a; }
+      .c-gray rect  { fill:#eef1f5; stroke:#6d7a8a; }
+      .c-gray .th-svg { fill:#2a3547; }
+      .c-teal rect  { fill:#e4f3f3; stroke:#0c7075; }
+      .c-teal .th-svg { fill:#085558; }
+      .c-teal .ts-svg { fill:#0c7075; }
+      .c-blue rect  { fill:#dbeafe; stroke:#2260d4; }
+      .c-blue .th-svg { fill:#1e3a5f; }
+      .c-red rect   { fill:#fde8e8; stroke:#982838; }
+      .c-red .th-svg { fill:#6b1d26; }
+      .c-purple rect { fill:#ede9fe; stroke:#6d28d9; }
+      .c-purple .th-svg { fill:#3b0764; }
+      .c-green rect { fill:#d1fae5; stroke:#1a8a48; }
+      .c-green .th-svg { fill:#14532d; }
+      .c-amber rect { fill:#fef3c7; stroke:#a07818; }
+      .c-amber .th-svg { fill:#633806; }
+    </style>
+  </defs>
+
+  <!-- Conminución -->
+  <g class="nd-svg c-gray" onclick="sel2('chancado')">
+    <rect x="22" y="128" width="108" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="76" y="150" text-anchor="middle" dominant-baseline="central">Conminución</text>
+  </g>
+
+  <path d="M130 143 Q144 143 153 81" stroke="#6d7a8a" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+  <path d="M130 150 L153 150" stroke="#6d7a8a" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+  <path d="M130 158 Q144 158 153 217" stroke="#6d7a8a" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Flotación -->
+  <g class="nd-svg c-red" onclick="sel2('flotacion')">
+    <rect x="157" y="59" width="90" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="202" y="81" text-anchor="middle" dominant-baseline="central">Flotación</text>
+  </g>
+
+  <!-- Biolixiviación -->
+  <g class="nd-svg c-teal" onclick="sel2('bio')">
+    <rect x="157" y="128" width="90" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="202" y="150" text-anchor="middle" dominant-baseline="central">Biolixiviación</text>
+  </g>
+
+  <!-- Lixiviación -->
+  <g class="nd-svg c-blue" onclick="sel2('lix-ac')">
+    <rect x="157" y="195" width="90" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="202" y="217" text-anchor="middle" dominant-baseline="central">Lixiviación</text>
+  </g>
+
+  <line x1="247" y1="81" x2="271" y2="81" stroke="#982838" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Fundición -->
+  <g class="nd-svg c-red" onclick="sel2('fundicion')">
+    <rect x="275" y="59" width="88" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="319" y="81" text-anchor="middle" dominant-baseline="central">Fundición</text>
+  </g>
+
+  <line x1="363" y1="81" x2="387" y2="81" stroke="#982838" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Electrorefinación -->
+  <g class="nd-svg c-red" onclick="sel2('eref')">
+    <rect x="391" y="59" width="116" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="449" y="81" text-anchor="middle" dominant-baseline="central">Electrorefinación</text>
+  </g>
+
+  <path d="M247 150 Q262 150 273 217" stroke="#1a6b3a" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+  <line x1="247" y1="217" x2="271" y2="217" stroke="#2260d4" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+  <line x1="275" y1="217" x2="275" y2="268" stroke="#6d7a8a" stroke-width="1" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Zona combinables -->
+  <rect x="295" y="264" width="362" height="126" rx="10" fill="none" stroke-width="0.5" stroke="#6d7a8a" stroke-dasharray="5 4"/>
+  <text class="ts-svg" x="476" y="280" text-anchor="middle" dominant-baseline="central">Purificación y refinación — etapas combinables</text>
+
+  <g class="nd-svg c-blue" onclick="sel2('memb')">
+    <rect x="307" y="292" width="156" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="385" y="314" text-anchor="middle" dominant-baseline="central">Membranas</text>
+  </g>
+
+  <g class="nd-svg c-blue" onclick="sel2('sx')">
+    <rect x="491" y="292" width="154" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="568" y="314" text-anchor="middle" dominant-baseline="central">SX</text>
+  </g>
+
+  <line x1="463" y1="314" x2="491" y2="314" stroke="#2260d4" stroke-width="0.8" fill="none" marker-end="url(#arr)"/>
+
+  <g class="nd-svg c-purple" onclick="sel2('ix')">
+    <rect x="307" y="350" width="156" height="32" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="385" y="366" text-anchor="middle" dominant-baseline="central">Intercambio iónico</text>
+  </g>
+
+  <g class="nd-svg c-purple" onclick="sel2('precip')">
+    <rect x="491" y="350" width="154" height="32" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="568" y="366" text-anchor="middle" dominant-baseline="central">Precipitación</text>
+  </g>
+
+  <line x1="463" y1="366" x2="491" y2="366" stroke="#6d28d9" stroke-width="0.8" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Fila inferior -->
+  <g class="nd-svg c-green" onclick="sel2('sustentabilidad')">
+    <rect x="22" y="416" width="192" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="118" y="438" text-anchor="middle" dominant-baseline="central">Sustentabilidad</text>
+  </g>
+
+  <g class="nd-svg c-amber" onclick="sel2('mantenimiento')">
+    <rect x="234" y="416" width="192" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="330" y="438" text-anchor="middle" dominant-baseline="central">Mantenimiento</text>
+  </g>
+
+  <g class="nd-svg c-teal" onclick="sel2('halion')">
+    <rect x="446" y="416" width="212" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th-svg" x="552" y="433" text-anchor="middle" dominant-baseline="central">Rutas emergentes</text>
+    <text class="ts-svg" x="552" y="449" text-anchor="middle" dominant-baseline="central">Lixiviación de sulfuros</text>
+  </g>
+</svg>
 </div>
 <section class="svc-section" id="services"><div class="sec-label" id="svc-label">Servicios</div><div class="sec-title" id="svc-title">¿Qué hacemos?</div><div class="sec-sub" id="svc-sub">Cerramos la brecha entre la ciencia y la operación minera.</div><div class="svc-grid" id="svc-grid"></div></section>
 <section class="blog-section" id="blog-section"><div class="sec-label">Publicaciones</div><div class="sec-title">Lo que estamos pensando</div><div class="sec-sub">Artículos sobre innovación y procesamiento de minerales.</div><div class="blog-grid" id="blog-grid"></div></section>
@@ -84,6 +187,7 @@ async function iB(){const p=await ld('Blog');const v=p.filter(p=>p.visible&&p.vi
 async function init(){await Promise.all([iC(),iT(),iS(),iB()]);}init();
 function sel(el){document.querySelectorAll('.nd').forEach(n=>n.classList.remove('on'));el.classList.add('on');const s=el.dataset.s;if(!s)return;if(s==='halion'){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('halion-section').scrollIntoView({behavior:'smooth',block:'start'});return;}document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));const panel=document.getElementById('p-'+s);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}}
 function openModal(){document.getElementById('modal').classList.add('show');}function closeModal(){document.getElementById('modal').classList.remove('show');}function sendForm(){alert('¡Gracias! Te contactaremos pronto.');closeModal();}document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function sel2(s){sel(document.querySelector('.nd[data-s="'+s+'"]')||document.createElement('div'));}
 </script>
 </body>
 </html>
