@@ -182,7 +182,17 @@ async function iT(){const t=await ld('Tecnologías');const v=t.filter(t=>t.visib
 document.querySelectorAll('.nd[data-s]').forEach(n=>{const s=n.dataset.s;if(b[s]){const bd=n.querySelector('.nd-badge');if(bd&&!bd.classList.contains('offer'))bd.textContent=b[s].length+' tech'+(b[s].length!==1?'s':'');}});
 const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','ew':'p-ew','relaves':'p-relaves'};
 Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});}
-async function iS(){const s=await ld('Servicios');const v=s.filter(s=>s.visible&&s.visible.toString().toLowerCase()==='si');const g=document.getElementById('svc-grid');if(!g||!v.length)return;const cl=[{b:'var(--teal-l)',f:'var(--teal)'},{b:'var(--copper-l)',f:'var(--copper)'},{b:'rgba(26,138,72,.06)',f:'var(--green)'},{b:'rgba(34,96,212,.06)',f:'var(--blue)'},{b:'rgba(160,120,24,.06)',f:'var(--gold)'},{b:'rgba(208,90,24,.06)',f:'var(--orange)'}];g.innerHTML=v.map((s,i)=>{const c=cl[i%cl.length];return`<div class="svc"><div class="svc-icon" style="background:${c.b};color:${c.f};">${s.icono||'◆'}</div><h3>${s.nombre}</h3><p>${s.descripcion}</p><div class="svc-tag">${s.modelo_cobro}</div></div>`;}).join('');}
+async function iS(){
+  const s = await ld('Servicios');
+  const v = s.filter(s => String(s.visible||'').toLowerCase().trim() === 'si');
+  const g = document.getElementById('svc-grid');
+  if(!g || !v.length) return;
+  const cl=[{b:'var(--teal-l)',f:'var(--teal)'},{b:'var(--copper-l)',f:'var(--copper)'},{b:'rgba(26,138,72,.06)',f:'var(--green)'},{b:'rgba(34,96,212,.06)',f:'var(--blue)'},{b:'rgba(160,120,24,.06)',f:'var(--gold)'},{b:'rgba(208,90,24,.06)',f:'var(--orange)'}];
+  g.innerHTML=v.map((s,i)=>{
+    const c=cl[i%cl.length];
+    return`<div class="svc"><div class="svc-icon" style="background:${c.b};color:${c.f};">${s.icono||'◆'}</div><h3>${s.nombre}</h3><p>${s.descripcion}</p><div class="svc-tag">${s.modelo_cobro||''}</div></div>`;
+  }).join('');
+}
 async function iB(){const p=await ld('Blog');const v=p.filter(p=>p.visible&&p.visible.toString().toLowerCase()==='si');if(!v.length)return;document.getElementById('blog-section').style.display='block';document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');}
 async function init(){await Promise.all([iC(),iT(),iS(),iB()]);}init();
 function sel(el){document.querySelectorAll('.nd').forEach(n=>n.classList.remove('on'));el.classList.add('on');const s=el.dataset.s;if(!s)return;if(s==='halion'){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('halion-section').scrollIntoView({behavior:'smooth',block:'start'});return;}document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));const panel=document.getElementById('p-'+s);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}}
