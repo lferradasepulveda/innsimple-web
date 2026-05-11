@@ -172,18 +172,18 @@ function ps(x){
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
   );
 
-  if(!j.table.rows || !j.table.rows.length) return [];
+  if(!j.table || !j.table.rows || !j.table.rows.length) return [];
 
-  // Primera fila como headers
-  const headers = j.table.rows[0].c.map(cell =>
-    String(cell?.v || '')
+  // Headers reales desde cols
+  const headers = j.table.cols.map(col =>
+    String(col.label || col.id || '')
       .trim()
       .toLowerCase()
       .replace(/\s+/g, '_')
   );
 
   // Filas reales
-  return j.table.rows.slice(1).map(row => {
+  return j.table.rows.map(row => {
     const obj = {};
 
     headers.forEach((header, i) => {
