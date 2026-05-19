@@ -252,8 +252,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <footer><p id="footer-t">© 2026 Innsimple SpA — Transferencia Tecnológica para Minería — Chile</p></footer>
 <div class="modal-bg" id="modal"><div class="modal"><h3>Hablemos de tu proyecto</h3><p>Nuestro equipo te contactará.</p><div class="modal-msg" id="modal-msg"></div><input type="text" id="f-nombre" placeholder="Nombre completo"/><input type="email" id="f-email" placeholder="Email corporativo"/><input type="text" id="f-empresa" placeholder="Empresa / Operación minera"/><input type="text" id="f-desafio" placeholder="¿Qué desafío buscas resolver?"/><div class="modal-btns"><button class="modal-cancel" id="modal-cancel-btn" onclick="closeModal()">Cancelar</button><button class="modal-send" id="modal-send-btn" onclick="sendForm()">Enviar</button></div></div></div>
 <script>
-const SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
-const sU=t=>`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
+const sU=t=>`/.netlify/functions/sheet?tab=${encodeURIComponent(t)}`;
 function ps(x){
   const j = JSON.parse(
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
@@ -309,8 +308,32 @@ if(c.servicios){if(c.servicios.label)document.getElementById('svc-label').textCo
 if(c.cta){if(c.cta.titulo)document.getElementById('cta-h').textContent=c.cta.titulo;if(c.cta.subtitulo)document.getElementById('cta-p').textContent=c.cta.subtitulo;if(c.cta.boton)document.getElementById('cta-btn').textContent=c.cta.boton;}
 if(c.footer&&c.footer.texto)document.getElementById('footer-t').textContent=c.footer.texto;
 if(c.nav){if(c.nav.link1)document.getElementById('nl1').textContent=c.nav.link1;if(c.nav.link2)document.getElementById('nl2').textContent=c.nav.link2;if(c.nav.link3)document.getElementById('nl3').textContent=c.nav.link3;if(c.nav.link4)document.getElementById('nl4').textContent=c.nav.link4;}}
+function drawSvgCounts(b){
+  const ns='http://www.w3.org/2000/svg';
+  document.querySelectorAll('.nd-svg[data-stage]').forEach(g=>{
+    const stage=g.dataset.stage;
+    const count=b[stage]?b[stage].length:0;
+    if(!count)return;
+    const rect=g.querySelector('rect');
+    if(!rect)return;
+    const bx=parseFloat(rect.getAttribute('x'))+parseFloat(rect.getAttribute('width'))-1;
+    const by=parseFloat(rect.getAttribute('y'))+1;
+    const bg=document.createElementNS(ns,'g');
+    const circle=document.createElementNS(ns,'circle');
+    circle.setAttribute('cx',bx);circle.setAttribute('cy',by);circle.setAttribute('r','10');
+    circle.setAttribute('fill','#0c7075');circle.setAttribute('stroke','#fff');circle.setAttribute('stroke-width','1.5');
+    const txt=document.createElementNS(ns,'text');
+    txt.setAttribute('x',bx);txt.setAttribute('y',by);
+    txt.setAttribute('text-anchor','middle');txt.setAttribute('dominant-baseline','central');
+    txt.setAttribute('font-size','9');txt.setAttribute('font-weight','700');txt.setAttribute('fill','#fff');
+    txt.setAttribute('font-family','IBM Plex Mono, monospace');
+    txt.textContent=count;
+    bg.appendChild(circle);bg.appendChild(txt);
+    g.appendChild(bg);
+  });
+}
 async function iT(){const t=await ld('Tecnologías');const v=t.filter(t=>t.visible&&t.visible.toString().toLowerCase()==='si');const b={};v.forEach(t=>{const s=t.etapa;if(!b[s])b[s]=[];b[s].push(t);});
-document.querySelectorAll('.nd[data-s]').forEach(n=>{const s=n.dataset.s;if(b[s]){const bd=n.querySelector('.nd-badge');if(bd&&!bd.classList.contains('offer'))bd.textContent=b[s].length+' tech'+(b[s].length!==1?'s':'');}});
+drawSvgCounts(b);
 const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx':'p-sx','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
 Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});}
 async function iS(){
