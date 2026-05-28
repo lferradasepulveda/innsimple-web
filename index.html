@@ -141,7 +141,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <text class="th-svg" x="385" y="314" text-anchor="middle" dominant-baseline="central">Membranas</text>
   </g>
 
-  <g class="nd-svg c-blue" data-stage="sx" onclick="sel2('sx')">
+  <g class="nd-svg c-blue" data-stage="sx-ew" onclick="sel2('sx-ew')">
     <rect x="491" y="292" width="154" height="44" rx="8" stroke-width="0.5"/>
     <text class="th-svg" x="568" y="314" text-anchor="middle" dominant-baseline="central">SX</text>
   </g>
@@ -208,7 +208,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="p-hd"><h2>Membranas — <span>Purificación y refinación</span></h2><div class="p-sub">Tecnologías de separación por membrana para purificación de soluciones y recuperación de agua de proceso.</div></div>
     <div class="t-list"></div>
   </div>
-  <div class="panel" id="p-sx">
+  <div class="panel" id="p-sx-ew">
     <div class="p-hd"><h2>Extracción por solventes — <span>SX</span></h2><div class="p-sub">Separación selectiva del cobre desde la solución PLS mediante solventes orgánicos. Etapa central de la ruta SX-EW.</div><div class="conv">Solución rica Cu</div></div>
     <div class="t-list"></div>
   </div>
@@ -344,9 +344,9 @@ function drawSvgCounts(b){
     g.appendChild(bg);
   });
 }
-async function iT(){const t=await ld('Tecnologías');const v=t.filter(t=>t.visible&&t.visible.toString().toLowerCase()==='si');const b={};v.forEach(t=>{const s=t.etapa;if(!b[s])b[s]=[];b[s].push(t);});
+async function iT(){const t=await ld('Tecnologías');const v=t.filter(t=>t.visible&&t.visible.toString().toLowerCase()==='si');const b={};v.forEach(t=>{const s=t.bloque_web;if(!b[s])b[s]=[];b[s].push(t);});
 drawSvgCounts(b);
-const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx':'p-sx','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
+const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
 Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});}
 async function iS(){
   const s = await ld('Servicios');
