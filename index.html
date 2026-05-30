@@ -274,7 +274,8 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
         <div class="wiz-dot on" id="wdot-1">1</div><div class="wiz-line"></div>
         <div class="wiz-dot" id="wdot-2">2</div><div class="wiz-line"></div>
         <div class="wiz-dot" id="wdot-3">3</div><div class="wiz-line"></div>
-        <div class="wiz-dot" id="wdot-4">4</div>
+        <div class="wiz-dot" id="wdot-4">4</div><div class="wiz-line"></div>
+        <div class="wiz-dot" id="wdot-5">5</div>
       </div>
       <button class="wiz-close" onclick="closeWizard()">✕</button>
     </div>
@@ -326,6 +327,20 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
         <div class="nda-ok" id="nda-sent-msg" style="display:none">✓ NDA enviado — tu cliente de correo abrió el mensaje. Haz clic en "Finalizar" para completar.</div>
       </div>
       <div class="wiz-s" id="ws4">
+        <div class="wiz-title">Datos técnicos del concentrado</div>
+        <div class="wiz-sub">Esta información permite a Loop Hydrometallurgy evaluar la compatibilidad técnica. Todos los campos son confidenciales bajo el NDA firmado.</div>
+        <div><div class="wiz-lbl">Análisis químico completo</div><textarea class="wiz-inp wiz-ta" id="wt-analisis" placeholder="Ej: Cu 24.5%, Fe 28%, S 32%, As 0.3%, Pb 1.2%, Zn 2.1%..."></textarea></div>
+        <div><div class="wiz-lbl">Mineralogía</div><textarea class="wiz-inp wiz-ta" id="wt-mineralogia" placeholder="Ej: Calcopirita 65%, Pirita 20%, Bornita 5%, Molibdenita 2%..."></textarea></div>
+        <div><div class="wiz-lbl">Metal principal a recuperar</div><input class="wiz-inp" id="wt-metal-principal" type="text" placeholder="Ej: Cobre (Cu)"/></div>
+        <div><div class="wiz-lbl">Subproductos de interés</div><input class="wiz-inp" id="wt-subproductos" type="text" placeholder="Ej: Plata (Ag), Oro (Au), Molibdeno (Mo)"/></div>
+        <div class="wiz-row">
+          <div><div class="wiz-lbl">Producción mensual concentrado (TMS)</div><input class="wiz-inp" id="wt-produccion" type="text" placeholder="Ej: 3500"/></div>
+          <div><div class="wiz-lbl">Humedad del concentrado (%)</div><input class="wiz-inp" id="wt-humedad" type="text" placeholder="Ej: 10"/></div>
+        </div>
+        <div><div class="wiz-lbl">Diagrama de flujo de la planta concentradora</div><textarea class="wiz-inp wiz-ta" id="wt-diagrama" placeholder="Describe el circuito o indica si puedes compartir el diagrama por email a lferrada@innsimple.com"></textarea></div>
+        <div style="font-size:.65rem;color:var(--muted);padding:.4rem .6rem;background:var(--bg2);border-radius:6px;">💡 Si tienes archivos (análisis de laboratorio, diagramas), puedes enviarlos a <strong>lferrada@innsimple.com</strong> indicando el nombre de tu proyecto.</div>
+      </div>
+      <div class="wiz-s" id="ws5">
         <div class="wiz-title">¡Proyecto registrado!</div>
         <div id="proj-confirm"></div>
       </div>
@@ -613,14 +628,14 @@ function openWizard(){
 }
 function closeWizard(){document.getElementById('wizard-modal').classList.remove('show');}
 function updateWizUI(){
-  [1,2,3,4].forEach(i=>{
+  [1,2,3,4,5].forEach(i=>{
     const dot=document.getElementById('wdot-'+i);
     if(dot){dot.classList.remove('on','done');if(i<_wizStep)dot.classList.add('done');else if(i===_wizStep)dot.classList.add('on');}
     const s=document.getElementById('ws'+i);if(s)s.classList.toggle('on',i===_wizStep);
   });
   const back=document.getElementById('wiz-back-btn');if(back)back.style.visibility=_wizStep===1?'hidden':'visible';
   const next=document.getElementById('wiz-next-btn');
-  if(next)next.textContent=_wizStep===3?'Finalizar →':_wizStep===4?'Cerrar':'Siguiente →';
+  if(next)next.textContent=_wizStep===4?'Finalizar →':_wizStep===5?'Cerrar':'Siguiente →';
 }
 function wizardNext(){
   if(_wizStep===1){
@@ -632,8 +647,19 @@ function wizardNext(){
   }else if(_wizStep===3){
     if(!wizVal(['w-empresa','w-rut','w-direccion','w-firmante-nombre','w-firmante-cargo','w-firmante-email']))return;
     if(!_ndaSent){alert('Primero envía el NDA al firmante autorizado.');return;}
-    saveProject();buildConfirm();_wizStep=4;
-  }else if(_wizStep===4){closeWizard();return;}
+    _wizStep=4;
+  }else if(_wizStep===4){
+    _wizData.tecnico={
+      analisisQuimico:document.getElementById('wt-analisis').value.trim(),
+      mineralogia:document.getElementById('wt-mineralogia').value.trim(),
+      metalPrincipal:document.getElementById('wt-metal-principal').value.trim(),
+      subproductos:document.getElementById('wt-subproductos').value.trim(),
+      produccionTMS:document.getElementById('wt-produccion').value.trim(),
+      humedad:document.getElementById('wt-humedad').value.trim(),
+      diagramaFlujo:document.getElementById('wt-diagrama').value.trim()
+    };
+    saveProject();buildConfirm();_wizStep=5;
+  }else if(_wizStep===5){closeWizard();return;}
   updateWizUI();
 }
 function wizardBack(){if(_wizStep>1){_wizStep--;updateWizUI();}}
@@ -686,7 +712,7 @@ function sendNDAEmail(){
 async function saveProject(){
   if(!currentUser)return;
   try{
-    await db.collection('proyectos').add({userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',nombre:_wizData.proyecto,pais:_wizData.pais,tipoMineral:_wizData.tipo,ley:_wizData.ley,tonelaje:_wizData.tonelaje,descripcion:_wizData.descripcion||'',tecnologia:'halion-loop',scoreCompatibilidad:_wizData.score?.niv||'',estado:'nda_enviado',empresa:_wizData.empresa||{},firmante:_wizData.firmante||{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('proyectos').add({userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',nombre:_wizData.proyecto,pais:_wizData.pais,tipoMineral:_wizData.tipo,ley:_wizData.ley,tonelaje:_wizData.tonelaje,descripcion:_wizData.descripcion||'',tecnologia:'halion-loop',scoreCompatibilidad:_wizData.score?.niv||'',estado:'nda_enviado',empresa:_wizData.empresa||{},firmante:_wizData.firmante||{},datosTecnicos:_wizData.tecnico||{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     fetch('https://formspree.io/f/xeedoled',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
       tipo:'🚀 Nuevo proyecto de innovación — acción requerida',
       '— PROYECTO —':'',
@@ -708,6 +734,14 @@ async function saveProject(){
       '— USUARIO PLATAFORMA —':'',
       usuario_nombre:currentUser.displayName||'—',
       usuario_email:currentUser.email,
+      '— DATOS TÉCNICOS —':'',
+      analisis_quimico:_wizData.tecnico?.analisisQuimico||'—',
+      mineralogia:_wizData.tecnico?.mineralogia||'—',
+      metal_principal:_wizData.tecnico?.metalPrincipal||'—',
+      subproductos:_wizData.tecnico?.subproductos||'—',
+      produccion_tms:_wizData.tecnico?.produccionTMS||'—',
+      humedad_pct:_wizData.tecnico?.humedad||'—',
+      diagrama_flujo:_wizData.tecnico?.diagramaFlujo||'—',
       '— ACCIÓN REQUERIDA —':'Enviar NDA pre-rellenado a firmante autorizado',
       nda_template:'https://innsimple.com/nda-halion-loop.docx'
     })}).catch(e=>console.warn('Formspree:',e));
