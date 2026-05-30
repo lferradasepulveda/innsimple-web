@@ -673,8 +673,9 @@ function sendNDAEmail(){
   const fC=document.getElementById('w-firmante-cargo').value.trim();
   const fE=document.getElementById('w-firmante-email').value.trim();
   const hoy=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+  const ndaUrl='https://innsimple.com/nda-halion-loop.docx';
   const subj=`Firma requerida — NDA Confidencialidad Halion Loop / ${emp}`;
-  const body=`Estimado/a ${fN},\n\nTe envío el Acuerdo de Confidencialidad Mutua (NDA) para firma en el marco de la evaluación de la tecnología Halion Loop™ de Loop Hydrometallurgy para nuestra operación "${_wizData.proyecto||emp}".\n\nRESUMEN DEL ACUERDO\n───────────────────\nPartes:\n  • Loop Hydrometallurgy Pty Ltd (ACN 631 226 665) — Australia\n  • ${emp} (RUT ${rut}) — ${dir}, ${pais}\nFecha: ${hoy}\nPropósito: Evaluar factibilidad técnica y económica de aplicar tecnología Halion Loop™ para el procesamiento de nuestro mineral.\nConfidencialidad: 3 años desde la firma\nJurisdicción: Santiago, Chile\nFirmantes por Loop: Dave Sammut y Heath Warman (Directors)\n───────────────────\n\nPara proceder, responde este email confirmando tu aprobación o contáctanos en:\nInnsimple — lferrada@innsimple.com\n\nInnsimple nos enviará el documento completo para firma formal.\n\nGracias,\n${currentUser?.displayName||'El equipo de '+emp}`;
+  const body=`Estimado/a ${fN},\n\nTe envío el Acuerdo de Confidencialidad Mutua (NDA) para tu revisión y firma, en el marco de la evaluación de la tecnología Halion Loop™ de Loop Hydrometallurgy para nuestra operación "${_wizData.proyecto||emp}".\n\n📄 DESCARGAR NDA COMPLETO:\n${ndaUrl}\n\nRESUMEN DEL ACUERDO\n───────────────────\nPartes:\n  • Loop Hydrometallurgy Pty Ltd (ACN 631 226 665) — Australia\n  • ${emp} (RUT ${rut}) — ${dir}, ${pais}\nFecha: ${hoy}\nPropósito: Evaluar factibilidad técnica y económica de aplicar tecnología Halion Loop™ para el procesamiento de nuestro mineral.\nConfidencialidad: 3 años desde la firma\nJurisdicción: Santiago, Chile\nFirmantes por Loop: Dave Sammut y Heath Warman (Directors)\n───────────────────\n\nPRÓXIMOS PASOS:\n1. Descarga y revisa el NDA en el link de arriba\n2. Responde este email confirmando tu aprobación\n3. Innsimple te enviará el documento pre-rellenado con los datos de nuestra empresa para firma formal\n\nContacto Innsimple: lferrada@innsimple.com\n\nGracias,\n${currentUser?.displayName||'El equipo de '+emp}`;
   window.open(`mailto:${fE}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`);
   _ndaSent=true;
   _wizData.empresa={nombre:emp,rut,direccion:dir,pais};
@@ -686,7 +687,30 @@ async function saveProject(){
   if(!currentUser)return;
   try{
     await db.collection('proyectos').add({userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',nombre:_wizData.proyecto,pais:_wizData.pais,tipoMineral:_wizData.tipo,ley:_wizData.ley,tonelaje:_wizData.tonelaje,descripcion:_wizData.descripcion||'',tecnologia:'halion-loop',scoreCompatibilidad:_wizData.score?.niv||'',estado:'nda_enviado',empresa:_wizData.empresa||{},firmante:_wizData.firmante||{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-    fetch('https://formspree.io/f/xeedoled',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({tipo:'🚀 Nuevo proyecto de innovación',proyecto:_wizData.proyecto,empresa:_wizData.empresa?.nombre,mineral:_wizData.tipo,score:_wizData.score?.niv,usuario:currentUser.email,firmante:`${_wizData.firmante?.nombre} (${_wizData.firmante?.cargo}) — ${_wizData.firmante?.email}`})}).catch(e=>console.warn('Formspree:',e));
+    fetch('https://formspree.io/f/xeedoled',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
+      tipo:'🚀 Nuevo proyecto de innovación — acción requerida',
+      '— PROYECTO —':'',
+      proyecto:_wizData.proyecto,
+      pais:_wizData.pais,
+      mineral:_wizData.tipo,
+      ley:_wizData.ley,
+      tonelaje:`${_wizData.tonelaje} t/mes`,
+      descripcion:_wizData.descripcion||'—',
+      compatibilidad:_wizData.score?.lbl||'—',
+      '— EMPRESA —':'',
+      empresa:_wizData.empresa?.nombre,
+      rut:_wizData.empresa?.rut,
+      direccion:_wizData.empresa?.direccion,
+      '— FIRMANTE NDA —':'',
+      firmante_nombre:_wizData.firmante?.nombre,
+      firmante_cargo:_wizData.firmante?.cargo,
+      firmante_email:_wizData.firmante?.email,
+      '— USUARIO PLATAFORMA —':'',
+      usuario_nombre:currentUser.displayName||'—',
+      usuario_email:currentUser.email,
+      '— ACCIÓN REQUERIDA —':'Enviar NDA pre-rellenado a firmante autorizado',
+      nda_template:'https://innsimple.com/nda-halion-loop.docx'
+    })}).catch(e=>console.warn('Formspree:',e));
   }catch(e){console.error('saveProject:',e);}
 }
 function buildConfirm(){
