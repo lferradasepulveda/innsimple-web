@@ -504,17 +504,20 @@ async function iB(){
 window.migrateFromSheets=async function(){
   const shUrl=t=>`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
   const fetchSheet=async t=>{const r=await fetch(shUrl(t));return ps(await r.text());};
+  // Limpia undefined y strings vacíos de un objeto
+  const clean=obj=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>k&&k!=='undefined'&&v!==undefined&&v!==null&&v!==''));
   console.log('🚀 Iniciando migración...');
   try{
     const techs=await fetchSheet('Tecnologías');
-    for(const t of techs){await db.collection('tecnologias').add(t);console.log('✓ tech:',t.nombre);}
+    for(const t of techs){if(!t.nombre)continue;await db.collection('tecnologias').add(clean(t));console.log('✓ tech:',t.nombre);}
     const svcs=await fetchSheet('Servicios');
-    for(const s of svcs){await db.collection('servicios').add(s);console.log('✓ servicio:',s.nombre);}
+    for(const s of svcs){if(!s.nombre)continue;await db.collection('servicios').add(clean(s));console.log('✓ servicio:',s.nombre);}
     const blog=await fetchSheet('Blog');
-    for(const p of blog){await db.collection('blog').add(p);console.log('✓ blog:',p.titulo);}
+    for(const p of blog){if(!p.titulo)continue;await db.collection('blog').add(clean(p));console.log('✓ blog:',p.titulo);}
     const rows=await fetchSheet('Contenido');
-    const c={};rows.forEach(row=>{if(!c[row.seccion])c[row.seccion]={};c[row.seccion][row.campo]=row.valor_es;});
-    for(const[sec,data]of Object.entries(c)){await db.collection('contenido').doc(sec).set(data);console.log('✓ contenido:',sec);}
+    const c={};
+    rows.forEach(row=>{if(!row.seccion||!row.campo||row.seccion==='undefined'||row.campo==='undefined')return;if(!c[row.seccion])c[row.seccion]={};if(row.valor_es!==undefined&&row.valor_es!=='')c[row.seccion][row.campo]=row.valor_es;});
+    for(const[sec,data]of Object.entries(c)){if(!sec||!Object.keys(data).length)continue;await db.collection('contenido').doc(sec).set(clean(data));console.log('✓ contenido:',sec);}
     console.log('✅ Migración completada. Recarga la página.');
     alert('✅ Migración completada. Recarga la página.');
   }catch(e){console.error('❌ Error en migración:',e);alert('Error: '+e.message);}
