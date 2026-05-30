@@ -502,7 +502,6 @@ async function iB(){
 // ── Migración única desde Google Sheets ───────────────────
 // Llama migrateFromSheets() desde la consola del navegador estando logueado
 window.migrateFromSheets=async function(){
-  if(!currentUser){alert('Debes estar logueado para migrar.');return;}
   const shUrl=t=>`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
   const fetchSheet=async t=>{const r=await fetch(shUrl(t));return ps(await r.text());};
   console.log('🚀 Iniciando migración...');
