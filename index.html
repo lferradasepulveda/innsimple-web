@@ -385,9 +385,8 @@ async function doLogin(){
 function onAuthSuccess(user){closeAuthModal();updateNavUser(user);if(_authCallback){_authCallback();_authCallback=null;}}
 function doLogout(){auth.signOut();}
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('auth-modal').addEventListener('click',function(e){if(e.target===this)closeAuthModal();});});
-// ── Google Sheets ─────────────────────────────────────────
-const _SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
-const sU=t=>`https://docs.google.com/spreadsheets/d/${_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
+// ── Migración desde Google Sheets (uso único) ────────────
+const _MIG_SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
 function ps(x){
   const j = JSON.parse(
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
@@ -433,16 +432,21 @@ function ps(x){
     return obj;
   });
 }
-async function ld(t){try{const r=await fetch(sU(t));return ps(await r.text());}catch(e){console.error(t,e);return[];}}
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
 function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="requireAuth(openModal)">Ver ficha completa →</button></div>`;}
-async function iC(){const r=await ld('Contenido');if(!r.length)return;const c={};r.forEach(r=>{if(!c[r.seccion])c[r.seccion]={};c[r.seccion][r.campo]=r.valor_es;});
-if(c.hero){if(c.hero.tag)document.getElementById('hero-tag').innerHTML='◆ '+c.hero.tag;if(c.hero.titulo&&c.hero.titulo_accent)document.getElementById('hero-h1').innerHTML=c.hero.titulo.replace(c.hero.titulo_accent,`<span class="acc">${c.hero.titulo_accent}</span>`);if(c.hero.subtitulo)document.getElementById('hero-p').textContent=c.hero.subtitulo;}
-if(c.halion){const h=c.halion;if(h.titulo)document.getElementById('h-title').innerHTML=h.titulo.replace(/haluros mixtos/,'<span>haluros mixtos</span>');if(h.subtitulo)document.getElementById('h-sub').textContent=h.subtitulo;if(h.trl)document.getElementById('h-trl').textContent=h.trl;if(h.descripcion)document.getElementById('h-desc').textContent=h.descripcion;if(h.cta_texto)document.getElementById('h-cta').textContent=h.cta_texto;if(h.tags)document.getElementById('h-tags').innerHTML=h.tags.split('|').map(t=>`<div class="h-tag">${t.trim()}</div>`).join('');if(h.stat1_valor)document.getElementById('h-stats').innerHTML=[{v:h.stat1_valor,l:h.stat1_label,c:''},{v:h.stat2_valor,l:h.stat2_label,c:' cu'},{v:h.stat3_valor,l:h.stat3_label,c:' au'},{v:h.stat4_valor,l:h.stat4_label,c:''}].map(s=>`<div class="h-st"><div class="v${s.c}">${s.v}</div><div class="l">${s.l}</div></div>`).join('');}
-if(c.servicios){if(c.servicios.label)document.getElementById('svc-label').textContent=c.servicios.label;if(c.servicios.titulo)document.getElementById('svc-title').textContent=c.servicios.titulo;if(c.servicios.subtitulo)document.getElementById('svc-sub').textContent=c.servicios.subtitulo;}
-if(c.cta){if(c.cta.titulo)document.getElementById('cta-h').textContent=c.cta.titulo;if(c.cta.subtitulo)document.getElementById('cta-p').textContent=c.cta.subtitulo;if(c.cta.boton)document.getElementById('cta-btn').textContent=c.cta.boton;}
-if(c.footer&&c.footer.texto)document.getElementById('footer-t').textContent=c.footer.texto;
-if(c.nav){if(c.nav.link1)document.getElementById('nl1').textContent=c.nav.link1;if(c.nav.link2)document.getElementById('nl2').textContent=c.nav.link2;if(c.nav.link3)document.getElementById('nl3').textContent=c.nav.link3;if(c.nav.link4)document.getElementById('nl4').textContent=c.nav.link4;}}
+async function iC(){
+  try{
+    const snap=await db.collection('contenido').get();
+    if(snap.empty)return;
+    const c={};snap.docs.forEach(doc=>{c[doc.id]=doc.data();});
+    if(c.hero){if(c.hero.tag)document.getElementById('hero-tag').innerHTML='◆ '+c.hero.tag;if(c.hero.titulo&&c.hero.titulo_accent)document.getElementById('hero-h1').innerHTML=c.hero.titulo.replace(c.hero.titulo_accent,`<span class="acc">${c.hero.titulo_accent}</span>`);if(c.hero.subtitulo)document.getElementById('hero-p').textContent=c.hero.subtitulo;}
+    if(c.halion){const h=c.halion;if(h.titulo)document.getElementById('h-title').innerHTML=h.titulo.replace(/haluros mixtos/,'<span>haluros mixtos</span>');if(h.subtitulo)document.getElementById('h-sub').textContent=h.subtitulo;if(h.trl)document.getElementById('h-trl').textContent=h.trl;if(h.descripcion)document.getElementById('h-desc').textContent=h.descripcion;if(h.cta_texto)document.getElementById('h-cta').textContent=h.cta_texto;if(h.tags)document.getElementById('h-tags').innerHTML=h.tags.split('|').map(t=>`<div class="h-tag">${t.trim()}</div>`).join('');if(h.stat1_valor)document.getElementById('h-stats').innerHTML=[{v:h.stat1_valor,l:h.stat1_label,c:''},{v:h.stat2_valor,l:h.stat2_label,c:' cu'},{v:h.stat3_valor,l:h.stat3_label,c:' au'},{v:h.stat4_valor,l:h.stat4_label,c:''}].map(s=>`<div class="h-st"><div class="v${s.c}">${s.v}</div><div class="l">${s.l}</div></div>`).join('');}
+    if(c.servicios){if(c.servicios.label)document.getElementById('svc-label').textContent=c.servicios.label;if(c.servicios.titulo)document.getElementById('svc-title').textContent=c.servicios.titulo;if(c.servicios.subtitulo)document.getElementById('svc-sub').textContent=c.servicios.subtitulo;}
+    if(c.cta){if(c.cta.titulo)document.getElementById('cta-h').textContent=c.cta.titulo;if(c.cta.subtitulo)document.getElementById('cta-p').textContent=c.cta.subtitulo;if(c.cta.boton)document.getElementById('cta-btn').textContent=c.cta.boton;}
+    if(c.footer&&c.footer.texto)document.getElementById('footer-t').textContent=c.footer.texto;
+    if(c.nav){if(c.nav.link1)document.getElementById('nl1').textContent=c.nav.link1;if(c.nav.link2)document.getElementById('nl2').textContent=c.nav.link2;if(c.nav.link3)document.getElementById('nl3').textContent=c.nav.link3;if(c.nav.link4)document.getElementById('nl4').textContent=c.nav.link4;}
+  }catch(e){console.error('iC:',e);}
+}
 function drawSvgCounts(b){
   const ns='http://www.w3.org/2000/svg';
   document.querySelectorAll('.nd-svg[data-stage]').forEach(g=>{
@@ -467,46 +471,55 @@ function drawSvgCounts(b){
     g.appendChild(bg);
   });
 }
-async function iT(){const t=await ld('Tecnologías');const v=t.filter(t=>t.visible&&t.visible.toString().toLowerCase()==='si');const b={};v.forEach(t=>{const s=t.bloque_web;if(!b[s])b[s]=[];b[s].push(t);});
-drawSvgCounts(b);
-const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
-Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});}
-async function iS(){
-  const s = await ld('Servicios');
-
-  const v = s.filter(row =>
-    ['si','sí','true','1'].includes(
-      String(row.visible || '').trim().toLowerCase()
-    )
-  );
-
-  const g = document.getElementById('svc-grid');
-  if(!g) return;
-
-  const cl = [
-    {b:'var(--teal-l)',f:'var(--teal)'},
-    {b:'var(--copper-l)',f:'var(--copper)'},
-    {b:'rgba(26,138,72,.06)',f:'var(--green)'},
-    {b:'rgba(34,96,212,.06)',f:'var(--blue)'},
-    {b:'rgba(160,120,24,.06)',f:'var(--gold)'}
-  ];
-
-  g.innerHTML = v.map((row,i)=>{
-    const c = cl[i % cl.length];
-
-    return `
-      <div class="svc">
-        <div class="svc-icon" style="background:${c.b};color:${c.f};">
-          ${row.icono || '◆'}
-        </div>
-        <h3>${row.nombre || ''}</h3>
-        <p>${row.descripcion || ''}</p>
-        <div class="svc-tag">${row.modelo_cobro || '-'}</div>
-      </div>
-    `;
-  }).join('');
+async function iT(){
+  try{
+    const snap=await db.collection('tecnologias').where('visible','==','si').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    const b={};v.forEach(t=>{const s=t.bloque_web;if(!b[s])b[s]=[];b[s].push(t);});
+    drawSvgCounts(b);
+    const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
+    Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});
+  }catch(e){console.error('iT:',e);}
 }
-async function iB(){const p=await ld('Blog');const v=p.filter(p=>p.visible&&p.visible.toString().toLowerCase()==='si');if(!v.length)return;document.getElementById('blog-section').style.display='block';document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');}
+async function iS(){
+  try{
+    const snap=await db.collection('servicios').where('visible','==','si').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    const g=document.getElementById('svc-grid');if(!g)return;
+    const cl=[{b:'var(--teal-l)',f:'var(--teal)'},{b:'var(--copper-l)',f:'var(--copper)'},{b:'rgba(26,138,72,.06)',f:'var(--green)'},{b:'rgba(34,96,212,.06)',f:'var(--blue)'},{b:'rgba(160,120,24,.06)',f:'var(--gold)'}];
+    g.innerHTML=v.map((row,i)=>{const c=cl[i%cl.length];return`<div class="svc"><div class="svc-icon" style="background:${c.b};color:${c.f};">${row.icono||'◆'}</div><h3>${row.nombre||''}</h3><p>${row.descripcion||''}</p><div class="svc-tag">${row.modelo_cobro||'-'}</div></div>`;}).join('');
+  }catch(e){console.error('iS:',e);}
+}
+async function iB(){
+  try{
+    const snap=await db.collection('blog').where('visible','==','si').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    if(!v.length)return;
+    document.getElementById('blog-section').style.display='block';
+    document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');
+  }catch(e){console.error('iB:',e);}
+}
+// ── Migración única desde Google Sheets ───────────────────
+// Llama migrateFromSheets() desde la consola del navegador estando logueado
+window.migrateFromSheets=async function(){
+  if(!currentUser){alert('Debes estar logueado para migrar.');return;}
+  const shUrl=t=>`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
+  const fetchSheet=async t=>{const r=await fetch(shUrl(t));return ps(await r.text());};
+  console.log('🚀 Iniciando migración...');
+  try{
+    const techs=await fetchSheet('Tecnologías');
+    for(const t of techs){await db.collection('tecnologias').add(t);console.log('✓ tech:',t.nombre);}
+    const svcs=await fetchSheet('Servicios');
+    for(const s of svcs){await db.collection('servicios').add(s);console.log('✓ servicio:',s.nombre);}
+    const blog=await fetchSheet('Blog');
+    for(const p of blog){await db.collection('blog').add(p);console.log('✓ blog:',p.titulo);}
+    const rows=await fetchSheet('Contenido');
+    const c={};rows.forEach(row=>{if(!c[row.seccion])c[row.seccion]={};c[row.seccion][row.campo]=row.valor_es;});
+    for(const[sec,data]of Object.entries(c)){await db.collection('contenido').doc(sec).set(data);console.log('✓ contenido:',sec);}
+    console.log('✅ Migración completada. Recarga la página.');
+    alert('✅ Migración completada. Recarga la página.');
+  }catch(e){console.error('❌ Error en migración:',e);alert('Error: '+e.message);}
+};
 async function init(){
   await iC().catch(e => console.error('iC error:', e));
   await iT().catch(e => console.error('iT error:', e));
