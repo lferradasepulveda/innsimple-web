@@ -385,8 +385,9 @@ async function doLogin(){
 function onAuthSuccess(user){closeAuthModal();updateNavUser(user);if(_authCallback){_authCallback();_authCallback=null;}}
 function doLogout(){auth.signOut();}
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('auth-modal').addEventListener('click',function(e){if(e.target===this)closeAuthModal();});});
-// ── Google Sheets proxy ───────────────────────────────────
-const sU=t=>`/.netlify/functions/sheet?tab=${encodeURIComponent(t)}`;
+// ── Google Sheets ─────────────────────────────────────────
+const _SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
+const sU=t=>`https://docs.google.com/spreadsheets/d/${_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
 function ps(x){
   const j = JSON.parse(
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
