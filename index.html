@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Innsimple — Transferencia Tecnológica para Minería</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <style>
 :root{--bg:#f8f9fb;--card:#fff;--dark:#141c2b;--dark2:#2a3547;--teal:#0c7075;--teal-l:#e4f3f3;--copper:#b06a38;--copper-l:#faf0e6;--gold:#a07818;--muted:#6d7a8a;--border:#dfe4ea;--green:#1a8a48;--blue:#2260d4;--red:#982838;--orange:#d05a18;--bg2:#eef1f5;--pyro:#982838;--hydro:#1a6b3a;--common:#1e3a5f;--mineral:#4a98a8}
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -27,6 +30,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.6rem 1.8rem;display
 footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;border-top:1px solid var(--border)}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center}.modal-bg.show{display:flex}.modal{background:#fff;border-radius:10px;padding:1.5rem;max-width:380px;width:90%;box-shadow:0 16px 40px rgba(0,0,0,.12)}.modal h3{font-size:.9rem;font-weight:700;margin-bottom:.2rem}.modal p{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}.modal input{width:100%;padding:.5rem .7rem;background:var(--bg2);border:1.5px solid var(--border);border-radius:6px;font-family:'DM Sans';font-size:.78rem;margin-bottom:.4rem;outline:none}.modal input:focus{border-color:var(--teal)}.modal-btns{display:flex;gap:.3rem;justify-content:flex-end;margin-top:.3rem}.modal-send{padding:.45rem .9rem;background:var(--teal);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-family:'DM Sans';font-size:.78rem;transition:opacity .2s}.modal-send:disabled{opacity:.55;cursor:not-allowed}.modal-cancel{padding:.45rem .9rem;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-family:'DM Sans';font-size:.78rem}.modal-msg{font-size:.72rem;padding:.4rem .6rem;border-radius:6px;margin-bottom:.4rem;display:none}.modal-msg.ok{display:block;background:rgba(26,138,72,.07);color:var(--green);border:1px solid rgba(26,138,72,.18)}.modal-msg.err{display:block;background:rgba(152,40,56,.06);color:var(--red);border:1px solid rgba(152,40,56,.18)}.modal input.invalid{border-color:var(--red)}
 .nav-hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:.4rem;border-radius:6px}.nav-hamburger span{display:block;width:20px;height:2px;background:var(--dark);border-radius:2px;transition:transform .25s,opacity .25s}
+.nav-user-chip{display:none;align-items:center;position:relative}.nav-user-inner{display:flex;align-items:center;gap:.35rem;padding:.28rem .65rem .28rem .28rem;border-radius:100px;background:var(--teal-l);border:1px solid rgba(12,112,117,.15);cursor:pointer;font-size:.75rem;font-weight:600;color:var(--teal)}.nav-user-initial{width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}.user-menu{display:none;position:absolute;top:calc(100% + .4rem);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:.3rem;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:101}.user-menu button{width:100%;padding:.4rem .6rem;background:none;border:none;border-radius:5px;font-family:'DM Sans';font-size:.75rem;color:var(--muted);cursor:pointer;text-align:left}.user-menu button:hover{background:var(--bg2);color:var(--dark)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin:-.2rem -1.5rem .8rem;padding:0 1.5rem}.auth-tab{flex:1;padding:.55rem;background:none;border:none;border-bottom:2px solid transparent;font-family:'DM Sans';font-size:.78rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:-1px}.auth-tab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
 @media(max-width:768px){
   .nav-hamburger{display:flex}
   nav ul{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:rgba(248,249,251,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:.4rem 1.5rem .8rem}
@@ -41,7 +46,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 </style>
 </head>
 <body>
-<nav><div class="logo"><svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="#00c4cc" stroke-width="2.5"/><circle cx="20" cy="8" r="1.5" fill="none" stroke="#00c4cc" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#00c4cc"/></svg><div class="logo-w">Innsimple</div></div><ul id="nav-links"><li><a href="#flow" id="nl1">Mapa Tecnológico</a></li><li><a href="#services" id="nl2">Servicios</a></li><li><a href="#about" id="nl3">Nosotros</a></li><li><a href="#" class="nav-cta" id="nl4" onclick="openModal();return false;">Contacto</a></li></ul><button class="nav-hamburger" id="nav-toggle" aria-label="Menú" onclick="toggleNav()"><span></span><span></span><span></span></button></nav>
+<nav><div class="logo"><svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="#00c4cc" stroke-width="2.5"/><circle cx="20" cy="8" r="1.5" fill="none" stroke="#00c4cc" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#00c4cc"/></svg><div class="logo-w">Innsimple</div></div><ul id="nav-links"><li><a href="#flow" id="nl1">Mapa Tecnológico</a></li><li><a href="#services" id="nl2">Servicios</a></li><li><a href="#about" id="nl3">Nosotros</a></li><li id="nav-cta-li"><a href="#" class="nav-cta" id="nl4" onclick="openModal();return false;">Contacto</a></li></ul><div id="nav-user-chip" class="nav-user-chip"></div><button class="nav-hamburger" id="nav-toggle" aria-label="Menú" onclick="toggleNav()"><span></span><span></span><span></span></button></nav>
 <section class="hero"><div class="hero-tag" id="hero-tag">◆ Transferencia Tecnológica para Minería</div><h1 id="hero-h1">Conectamos <span class="acc">innovación</span> con operaciones mineras</h1><p id="hero-p">Evaluamos, seleccionamos y facilitamos la adopción de tecnologías emergentes para el procesamiento de minerales.</p></section>
 <div class="tabs" id="flow"><button class="tab on">Cobre</button><button class="tab soon">Litio — pronto</button><button class="tab soon">Oro — pronto</button></div>
 <div class="flow-wrap"><div class="flow-title" id="flow-title">Cadena de proceso del cobre — selecciona una etapa</div>
@@ -253,7 +258,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
       <div class="h-tag">Hidrometalurgia avanzada</div>
       <div class="h-tag">Menor huella de carbono</div>
     </div>
-    <button class="h-cta" id="h-cta" onclick="openModal()">Solicitar evaluación →</button>
+    <button class="h-cta" id="h-cta" onclick="requireAuth(openModal)">Solicitar evaluación →</button>
   </div>
 </section>
 
@@ -261,10 +266,118 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <section class="blog-section" id="blog-section"><div class="sec-label">Publicaciones</div><div class="sec-title">Lo que estamos pensando</div><div class="sec-sub">Artículos sobre innovación y procesamiento de minerales.</div><div class="blog-grid" id="blog-grid"></div></section>
 <section class="cta"><div class="cta-box"><h2 id="cta-h">¿Tienes un desafío de procesamiento?</h2><p id="cta-p">Evaluamos la compatibilidad técnica entre tu mineral y las tecnologías disponibles.</p><button class="cta-btn" id="cta-btn" onclick="openModal()">Conversemos →</button></div></section>
 <footer><p id="footer-t">© 2026 Innsimple SpA — Transferencia Tecnológica para Minería — Chile</p></footer>
+<div class="modal-bg" id="auth-modal">
+  <div class="modal">
+    <h3>Accede a Innsimple</h3>
+    <p>Crea tu cuenta para ver fichas completas y crear proyectos de innovación.</p>
+    <div class="modal-msg" id="auth-msg"></div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" data-tab="register" onclick="switchAuthTab('register')">Registrarse</button>
+      <button class="auth-tab" data-tab="login" onclick="switchAuthTab('login')">Ingresar</button>
+    </div>
+    <div id="auth-register-form">
+      <input type="text" id="ar-nombre" placeholder="Nombre completo"/>
+      <input type="email" id="ar-email" placeholder="Email corporativo"/>
+      <input type="text" id="ar-empresa" placeholder="Empresa / Operación minera"/>
+      <input type="text" id="ar-cargo" placeholder="Cargo"/>
+      <input type="password" id="ar-pass" placeholder="Contraseña (mín. 6 caracteres)"/>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeAuthModal()">Cancelar</button>
+        <button class="modal-send" id="auth-reg-btn" onclick="doRegister()">Crear cuenta →</button>
+      </div>
+    </div>
+    <div id="auth-login-form" style="display:none">
+      <input type="email" id="al-email" placeholder="Email"/>
+      <input type="password" id="al-pass" placeholder="Contraseña"/>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeAuthModal()">Cancelar</button>
+        <button class="modal-send" id="auth-log-btn" onclick="doLogin()">Ingresar →</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-bg" id="modal"><div class="modal"><h3>Hablemos de tu proyecto</h3><p>Nuestro equipo te contactará.</p><div class="modal-msg" id="modal-msg"></div><input type="text" id="f-nombre" placeholder="Nombre completo"/><input type="email" id="f-email" placeholder="Email corporativo"/><input type="text" id="f-empresa" placeholder="Empresa / Operación minera"/><input type="text" id="f-desafio" placeholder="¿Qué desafío buscas resolver?"/><div class="modal-btns"><button class="modal-cancel" id="modal-cancel-btn" onclick="closeModal()">Cancelar</button><button class="modal-send" id="modal-send-btn" onclick="sendForm()">Enviar</button></div></div></div>
 <script>
-const SID='1Z2BZ7AqvBt9_bBb0VAP52NvZ7-9WsYDOE2BbbhWVRo4';
-const sU=t=>`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
+// ── Firebase ──────────────────────────────────────────────
+const _fb=firebase.initializeApp({apiKey:"AIzaSyAcYT62-aO-Bz3lFrMFdX-8s4H4xs9TvY0",authDomain:"innsimple-82d1d.firebaseapp.com",projectId:"innsimple-82d1d",storageBucket:"innsimple-82d1d.firebasestorage.app",messagingSenderId:"1098970243830",appId:"1:1098970243830:web:ec23ce6063481e521682d7"});
+const auth=firebase.auth();
+const db=firebase.firestore();
+let currentUser=null;
+let _authCallback=null;
+
+auth.onAuthStateChanged(user=>{currentUser=user;updateNavUser(user);});
+
+function updateNavUser(user){
+  const chip=document.getElementById('nav-user-chip');
+  const ctaLi=document.getElementById('nav-cta-li');
+  if(!chip)return;
+  if(user){
+    const name=user.displayName||user.email.split('@')[0];
+    const initial=name.charAt(0).toUpperCase();
+    chip.style.display='flex';
+    chip.innerHTML=`<div class="nav-user-inner" onclick="toggleUserMenu()"><div class="nav-user-initial">${initial}</div><span>${name}</span></div><div class="user-menu" id="user-menu"><button onclick="doLogout()">Cerrar sesión</button></div>`;
+    if(ctaLi)ctaLi.style.display='none';
+  }else{chip.style.display='none';chip.innerHTML='';if(ctaLi)ctaLi.style.display='';}
+}
+function toggleUserMenu(){const m=document.getElementById('user-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
+document.addEventListener('click',e=>{if(!e.target.closest('#nav-user-chip')){const m=document.getElementById('user-menu');if(m)m.style.display='none';}});
+
+function requireAuth(cb){
+  if(currentUser){if(typeof cb==='function')cb();}
+  else{_authCallback=cb||null;showAuthModal();}
+}
+function showAuthModal(){
+  ['ar-nombre','ar-email','ar-empresa','ar-cargo','ar-pass','al-email','al-pass'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.classList.remove('invalid');}});
+  const m=document.getElementById('auth-msg');if(m){m.className='modal-msg';m.textContent='';}
+  const rb=document.getElementById('auth-reg-btn');if(rb){rb.disabled=false;rb.textContent='Crear cuenta →';}
+  const lb=document.getElementById('auth-log-btn');if(lb){lb.disabled=false;lb.textContent='Ingresar →';}
+  switchAuthTab('register');
+  document.getElementById('auth-modal').classList.add('show');
+}
+function closeAuthModal(){document.getElementById('auth-modal').classList.remove('show');}
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('.auth-tab[data-tab="'+tab+'"]').classList.add('on');
+  document.getElementById('auth-register-form').style.display=tab==='register'?'':'none';
+  document.getElementById('auth-login-form').style.display=tab==='login'?'':'none';
+  const m=document.getElementById('auth-msg');if(m){m.className='modal-msg';m.textContent='';}
+}
+async function doRegister(){
+  const f={nombre:document.getElementById('ar-nombre'),email:document.getElementById('ar-email'),empresa:document.getElementById('ar-empresa'),cargo:document.getElementById('ar-cargo'),pass:document.getElementById('ar-pass')};
+  const msg=document.getElementById('auth-msg');const btn=document.getElementById('auth-reg-btn');
+  let ok=true;Object.values(f).forEach(el=>{el.classList.remove('invalid');if(!el.value.trim()){el.classList.add('invalid');ok=false;}});
+  if(!ok){msg.className='modal-msg err';msg.textContent='Completa todos los campos.';return;}
+  if(f.pass.value.length<6){f.pass.classList.add('invalid');msg.className='modal-msg err';msg.textContent='Contraseña mínimo 6 caracteres.';return;}
+  btn.disabled=true;btn.textContent='Creando cuenta…';msg.className='modal-msg';msg.textContent='';
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(f.email.value.trim(),f.pass.value);
+    await cred.user.updateProfile({displayName:f.nombre.value.trim()});
+    await db.collection('usuarios').doc(cred.user.uid).set({nombre:f.nombre.value.trim(),email:f.email.value.trim(),empresa:f.empresa.value.trim(),cargo:f.cargo.value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    onAuthSuccess(cred.user);
+  }catch(e){
+    const em={'auth/email-already-in-use':'Este email ya tiene cuenta. ¿Quieres ingresar?','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña muy débil.'};
+    msg.className='modal-msg err';msg.textContent=em[e.code]||'Error al crear cuenta.';btn.disabled=false;btn.textContent='Crear cuenta →';
+  }
+}
+async function doLogin(){
+  const email=document.getElementById('al-email');const pass=document.getElementById('al-pass');
+  const msg=document.getElementById('auth-msg');const btn=document.getElementById('auth-log-btn');
+  let ok=true;[email,pass].forEach(el=>{el.classList.remove('invalid');if(!el.value.trim()){el.classList.add('invalid');ok=false;}});
+  if(!ok){msg.className='modal-msg err';msg.textContent='Completa todos los campos.';return;}
+  btn.disabled=true;btn.textContent='Ingresando…';msg.className='modal-msg';msg.textContent='';
+  try{
+    const cred=await auth.signInWithEmailAndPassword(email.value.trim(),pass.value);
+    onAuthSuccess(cred.user);
+  }catch(e){
+    const em={'auth/user-not-found':'No existe cuenta con este email.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Email o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Intenta más tarde.'};
+    msg.className='modal-msg err';msg.textContent=em[e.code]||'Error al ingresar.';btn.disabled=false;btn.textContent='Ingresar →';
+  }
+}
+function onAuthSuccess(user){closeAuthModal();updateNavUser(user);if(_authCallback){_authCallback();_authCallback=null;}}
+function doLogout(){auth.signOut();}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('auth-modal').addEventListener('click',function(e){if(e.target===this)closeAuthModal();});});
+// ── Google Sheets proxy ───────────────────────────────────
+const sU=t=>`/.netlify/functions/sheet?tab=${encodeURIComponent(t)}`;
 function ps(x){
   const j = JSON.parse(
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
@@ -312,7 +425,7 @@ function ps(x){
 }
 async function ld(t){try{const r=await fetch(sU(t));return ps(await r.text());}catch(e){console.error(t,e);return[];}}
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
-function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="openModal()">Solicitar info →</button></div>`;}
+function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="requireAuth(openModal)">Ver ficha completa →</button></div>`;}
 async function iC(){const r=await ld('Contenido');if(!r.length)return;const c={};r.forEach(r=>{if(!c[r.seccion])c[r.seccion]={};c[r.seccion][r.campo]=r.valor_es;});
 if(c.hero){if(c.hero.tag)document.getElementById('hero-tag').innerHTML='◆ '+c.hero.tag;if(c.hero.titulo&&c.hero.titulo_accent)document.getElementById('hero-h1').innerHTML=c.hero.titulo.replace(c.hero.titulo_accent,`<span class="acc">${c.hero.titulo_accent}</span>`);if(c.hero.subtitulo)document.getElementById('hero-p').textContent=c.hero.subtitulo;}
 if(c.halion){const h=c.halion;if(h.titulo)document.getElementById('h-title').innerHTML=h.titulo.replace(/haluros mixtos/,'<span>haluros mixtos</span>');if(h.subtitulo)document.getElementById('h-sub').textContent=h.subtitulo;if(h.trl)document.getElementById('h-trl').textContent=h.trl;if(h.descripcion)document.getElementById('h-desc').textContent=h.descripcion;if(h.cta_texto)document.getElementById('h-cta').textContent=h.cta_texto;if(h.tags)document.getElementById('h-tags').innerHTML=h.tags.split('|').map(t=>`<div class="h-tag">${t.trim()}</div>`).join('');if(h.stat1_valor)document.getElementById('h-stats').innerHTML=[{v:h.stat1_valor,l:h.stat1_label,c:''},{v:h.stat2_valor,l:h.stat2_label,c:' cu'},{v:h.stat3_valor,l:h.stat3_label,c:' au'},{v:h.stat4_valor,l:h.stat4_label,c:''}].map(s=>`<div class="h-st"><div class="v${s.c}">${s.v}</div><div class="l">${s.l}</div></div>`).join('');}
