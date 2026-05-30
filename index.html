@@ -352,11 +352,20 @@ async function doRegister(){
   try{
     const cred=await auth.createUserWithEmailAndPassword(f.email.value.trim(),f.pass.value);
     await cred.user.updateProfile({displayName:f.nombre.value.trim()});
-    await db.collection('usuarios').doc(cred.user.uid).set({nombre:f.nombre.value.trim(),email:f.email.value.trim(),empresa:f.empresa.value.trim(),cargo:f.cargo.value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    // Firestore es opcional — si falla, el login igual funciona
+    db.collection('usuarios').doc(cred.user.uid).set({nombre:f.nombre.value.trim(),email:f.email.value.trim(),empresa:f.empresa.value.trim(),cargo:f.cargo.value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(err=>console.warn('Firestore:',err));
     onAuthSuccess(cred.user);
   }catch(e){
-    const em={'auth/email-already-in-use':'Este email ya tiene cuenta. ¿Quieres ingresar?','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña muy débil.'};
-    msg.className='modal-msg err';msg.textContent=em[e.code]||'Error al crear cuenta.';btn.disabled=false;btn.textContent='Crear cuenta →';
+    const em={
+      'auth/email-already-in-use':'Este email ya tiene cuenta. Usa la pestaña Ingresar.',
+      'auth/invalid-email':'Email inválido.',
+      'auth/weak-password':'Contraseña muy débil (mín. 6 caracteres).',
+      'auth/operation-not-allowed':'Autenticación por email no habilitada en Firebase Console.',
+      'auth/network-request-failed':'Error de red. Revisa tu conexión.'
+    };
+    msg.className='modal-msg err';
+    msg.textContent=(em[e.code]||'Error: ')+(!em[e.code]?e.message:'');
+    btn.disabled=false;btn.textContent='Crear cuenta →';
   }
 }
 async function doLogin(){
