@@ -488,40 +488,38 @@ function ps(x){
 
   if(!j.table || !j.table.rows || !j.table.rows.length) return [];
 
-  let headers = j.table.cols.map(col =>
-    String(col.label || col.id || '')
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '_')
+  const rawHeaders = j.table.cols.map(col =>
+    String(col.label || col.id || '').trim().toLowerCase().replace(/\s+/g, '_')
   );
 
-  // Si Google devuelve a,b,c... usamos primera fila como headers reales
-  const genericHeaders = headers.every(h => /^[a-z]$/.test(h));
+  // Usamos primera fila como headers cuando:
+  // 1. Google devuelve letras genéricas (a,b,c...)
+  // 2. Los labels tienen header+datos concatenados (más de 3 guiones bajos = múltiples palabras)
+  const useFirstRow =
+    rawHeaders.every(h => /^[a-z]$/.test(h)) ||
+    rawHeaders.some(h => h.split('_').length > 3);
 
-  if (genericHeaders) {
-    headers = j.table.rows[0].c.map(cell =>
-      String(cell?.v || '')
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '_')
+  if (useFirstRow) {
+    const headers = j.table.rows[0].c.map(cell =>
+      String(cell?.v || '').trim().toLowerCase().replace(/\s+/g, '_')
     );
-
     return j.table.rows.slice(1).map(row => {
       const obj = {};
-      headers.forEach((header, i) => {
+      headers.forEach((h, i) => {
+        if(!h) return;
         const cell = row.c[i];
-        obj[header] = cell?.v ?? cell?.f ?? '';
+        obj[h] = cell?.v ?? cell?.f ?? '';
       });
       return obj;
     });
   }
 
-  // Caso normal
+  // Caso normal: labels son los nombres reales de columnas
   return j.table.rows.map(row => {
     const obj = {};
-    headers.forEach((header, i) => {
+    rawHeaders.forEach((h, i) => {
       const cell = row.c[i];
-      obj[header] = cell?.v ?? cell?.f ?? '';
+      obj[h] = cell?.v ?? cell?.f ?? '';
     });
     return obj;
   });
