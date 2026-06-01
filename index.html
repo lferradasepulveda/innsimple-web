@@ -572,7 +572,7 @@ async function iT(){
     const snap=await db.collection('tecnologias').where('visible','==','si').get();
     const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
     v.forEach(t=>{_techMap[t._id]=t;});
-    const b={};v.forEach(t=>{const s=t.bloque_web;if(!b[s])b[s]=[];b[s].push(t);});
+    const b={};v.forEach(t=>{const s=t.bloque_web||t.bloque||t.etapa;if(!b[s])b[s]=[];b[s].push(t);});
     drawSvgCounts(b);
     const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
     Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});
@@ -612,7 +612,14 @@ window.migrateFromSheets=async function(){
       console.log(`🧹 ${col} limpiado (${snap.docs.length} docs)`);
     }
     const techs=await fetchSheet('Tecnologías');
-    for(const t of techs){if(!t.nombre)continue;await db.collection('tecnologias').add(clean(t));console.log('✓ tech:',t.nombre);}
+    for(const t of techs){
+      if(!t.nombre)continue;
+      const doc=clean(t);
+      // Normalizar nombre del campo de bloque
+      if(!doc.bloque_web){doc.bloque_web=doc.bloque||doc.etapa||'';}
+      await db.collection('tecnologias').add(doc);
+      console.log('✓ tech:',doc.nombre,'→ bloque_web:',doc.bloque_web);
+    }
     const svcs=await fetchSheet('Servicios');
     for(const s of svcs){if(!s.nombre)continue;await db.collection('servicios').add(clean(s));console.log('✓ servicio:',s.nombre);}
     const blog=await fetchSheet('Blog');
