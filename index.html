@@ -8,7 +8,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <style>
 :root{--bg:#f8f9fb;--card:#fff;--dark:#141c2b;--dark2:#2a3547;--teal:#0c7075;--teal-l:#e4f3f3;--copper:#b06a38;--copper-l:#faf0e6;--gold:#a07818;--muted:#6d7a8a;--border:#dfe4ea;--green:#1a8a48;--blue:#2260d4;--red:#982838;--orange:#d05a18;--bg2:#eef1f5;--pyro:#982838;--hydro:#1a6b3a;--common:#1e3a5f;--mineral:#4a98a8}
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -341,14 +340,14 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
         </div>
         <div>
           <div class="wiz-lbl">Diagrama de flujo de la planta concentradora</div>
-          <div class="fu-box"><input type="file" id="wt-diagrama-file" accept=".pdf,.png,.jpg,.jpeg,.dwg,.xlsx,.xls,.ppt,.pptx" onchange="onFileSelect(this,'fu-diag-name')"/><label for="wt-diagrama-file">📎 Adjuntar archivo</label><span class="fu-name" id="fu-diag-name">PDF, imagen, DWG o Excel</span></div>
-          <textarea class="wiz-inp wiz-ta" id="wt-diagrama" placeholder="(Opcional) Describe brevemente el circuito si no tienes el archivo a mano..." style="margin-top:.35rem"></textarea>
+          <textarea class="wiz-inp wiz-ta" id="wt-diagrama" placeholder="Describe el circuito brevemente..."></textarea>
+          <input class="wiz-inp" id="wt-diagrama-link" type="url" placeholder="O pega un link de Google Drive / Dropbox con el archivo" style="margin-top:.35rem"/>
         </div>
         <div>
           <div class="wiz-lbl">Otros documentos (análisis de laboratorio, informes, etc.)</div>
-          <div class="fu-box"><input type="file" id="wt-otros-files" accept=".pdf,.png,.jpg,.jpeg,.xlsx,.xls,.docx,.csv,.txt" multiple onchange="onFilesSelect(this,'fu-otros-name')"/><label for="wt-otros-files">📎 Adjuntar archivos</label><span class="fu-name" id="fu-otros-name">Puedes seleccionar múltiples archivos</span></div>
+          <input class="wiz-inp" id="wt-otros-link" type="url" placeholder="Link de Google Drive / Dropbox con archivos compartidos"/>
+          <div style="font-size:.65rem;color:var(--muted);margin-top:.35rem;padding:.4rem .6rem;background:var(--bg2);border-radius:6px;">💡 También puedes enviar archivos directamente a <strong>lferrada@innsimple.com</strong> indicando el nombre de tu proyecto.</div>
         </div>
-        <div id="upload-status" class="upload-prog" style="display:none"></div>
       </div>
       <div class="wiz-s" id="ws5">
         <div class="wiz-title">¡Proyecto registrado!</div>
@@ -397,7 +396,6 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 const _fb=firebase.initializeApp({apiKey:"AIzaSyAcYT62-aO-Bz3lFrMFdX-8s4H4xs9TvY0",authDomain:"innsimple-82d1d.firebaseapp.com",projectId:"innsimple-82d1d",storageBucket:"innsimple-82d1d.firebasestorage.app",messagingSenderId:"1098970243830",appId:"1:1098970243830:web:ec23ce6063481e521682d7"});
 const auth=firebase.auth();
 const db=firebase.firestore();
-const storage=firebase.storage();
 let currentUser=null;
 let _authCallback=null;
 
@@ -660,8 +658,6 @@ function wizardNext(){
     if(!_ndaSent){alert('Primero envía el NDA al firmante autorizado.');return;}
     _wizStep=4;
   }else if(_wizStep===4){
-    const btn=document.getElementById('wiz-next-btn');
-    btn.disabled=true;btn.textContent='Subiendo archivos…';
     _wizData.tecnico={
       analisisQuimico:document.getElementById('wt-analisis').value.trim(),
       mineralogia:document.getElementById('wt-mineralogia').value.trim(),
@@ -669,53 +665,15 @@ function wizardNext(){
       subproductos:document.getElementById('wt-subproductos').value.trim(),
       produccionTMS:document.getElementById('wt-produccion').value.trim(),
       humedad:document.getElementById('wt-humedad').value.trim(),
-      diagramaFlujo:document.getElementById('wt-diagrama').value.trim()
+      diagramaFlujo:document.getElementById('wt-diagrama').value.trim(),
+      diagramaLink:document.getElementById('wt-diagrama-link').value.trim(),
+      otrosLink:document.getElementById('wt-otros-link').value.trim()
     };
-    uploadFiles().then(fileUrls=>{
-      _wizData.tecnico.archivos=fileUrls;
-      saveProject();buildConfirm();
-      _wizStep=5;updateWizUI();
-      btn.disabled=false;btn.textContent='Cerrar';
-    }).catch(e=>{
-      console.error('upload:',e);
-      btn.disabled=false;btn.textContent='Finalizar →';
-      alert('Error al subir archivos. Intenta de nuevo o continúa sin adjuntar.');
-    });
-    return;
+    saveProject();buildConfirm();_wizStep=5;
   }else if(_wizStep===5){closeWizard();return;}
   updateWizUI();
 }
 function wizardBack(){if(_wizStep>1){_wizStep--;updateWizUI();}}
-function onFileSelect(input,nameId){const f=input.files[0];const el=document.getElementById(nameId);if(f){el.textContent=f.name;el.classList.add('loaded');}else{el.textContent='PDF, imagen, DWG o Excel';el.classList.remove('loaded');}}
-function onFilesSelect(input,nameId){const n=input.files.length;const el=document.getElementById(nameId);if(n===0){el.textContent='Puedes seleccionar múltiples archivos';el.classList.remove('loaded');}else{el.textContent=n===1?input.files[0].name:`${n} archivos seleccionados`;el.classList.add('loaded');}}
-async function uploadFiles(){
-  const urls={};
-  if(!currentUser)return urls;
-  const uid=currentUser.uid;
-  const ts=Date.now();
-  const status=document.getElementById('upload-status');
-  const setStatus=msg=>{if(status){status.style.display='block';status.textContent=msg;}};
-  const diagramaFile=document.getElementById('wt-diagrama-file')?.files[0];
-  if(diagramaFile){
-    setStatus(`Subiendo diagrama: ${diagramaFile.name}…`);
-    const ref=storage.ref(`proyectos/${uid}/${ts}/diagrama_${diagramaFile.name}`);
-    await ref.put(diagramaFile);
-    urls.diagrama={nombre:diagramaFile.name,url:await ref.getDownloadURL()};
-  }
-  const otrosFiles=document.getElementById('wt-otros-files')?.files;
-  if(otrosFiles&&otrosFiles.length>0){
-    urls.otros=[];
-    for(let i=0;i<otrosFiles.length;i++){
-      const f=otrosFiles[i];
-      setStatus(`Subiendo ${i+1}/${otrosFiles.length}: ${f.name}…`);
-      const ref=storage.ref(`proyectos/${uid}/${ts}/otros_${f.name}`);
-      await ref.put(f);
-      urls.otros.push({nombre:f.name,url:await ref.getDownloadURL()});
-    }
-  }
-  if(status)status.style.display='none';
-  return urls;
-}
 function wizVal(ids){let ok=true;ids.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('invalid');if(!el.value.trim()){el.classList.add('invalid');ok=false;}}});return ok;}
 function buildScore(){
   const tipo=_wizData.tipo,ley=_wizData.ley,ton=_wizData.tonelaje;
