@@ -602,6 +602,12 @@ window.migrateFromSheets=async function(){
   const clean=obj=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>k&&k!=='undefined'&&v!==undefined&&v!==null&&v!==''));
   console.log('🚀 Iniciando migración...');
   try{
+    // Limpiar colecciones antes de insertar para evitar duplicados
+    for(const col of ['tecnologias','servicios','blog']){
+      const snap=await db.collection(col).get();
+      for(const doc of snap.docs)await doc.ref.delete();
+      console.log(`🧹 ${col} limpiado (${snap.docs.length} docs)`);
+    }
     const techs=await fetchSheet('Tecnologías');
     for(const t of techs){if(!t.nombre)continue;await db.collection('tecnologias').add(clean(t));console.log('✓ tech:',t.nombre);}
     const svcs=await fetchSheet('Servicios');
