@@ -527,7 +527,9 @@ function ps(x){
   });
 }
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
-function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="requireAuth(openWizard)">Crear proyecto →</button></div>`;}
+const _techMap={};
+function openWizardForTech(id){requireAuth(()=>openWizard(_techMap[id]||{}));}
+function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="openWizardForTech('${t._id}')">Crear proyecto →</button></div>`;}
 async function iC(){
   try{
     const snap=await db.collection('contenido').get();
@@ -569,6 +571,7 @@ async function iT(){
   try{
     const snap=await db.collection('tecnologias').where('visible','==','si').get();
     const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    v.forEach(t=>{_techMap[t._id]=t;});
     const b={};v.forEach(t=>{const s=t.bloque_web;if(!b[s])b[s]=[];b[s].push(t);});
     drawSvgCounts(b);
     const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
@@ -630,9 +633,9 @@ async function init(){
 }
 window.addEventListener('DOMContentLoaded', init);
 // ── Wizard de innovación ──────────────────────────────────
-let _wizStep=1,_wizData={},_ndaSent=false;
-function openWizard(){
-  _wizStep=1;_wizData={};_ndaSent=false;
+let _wizStep=1,_wizData={},_ndaSent=false,_wizTech={};
+function openWizard(tech){
+  _wizStep=1;_wizData={};_ndaSent=false;_wizTech=tech||{};
   ['w-proyecto','w-pais','w-ley','w-tonelaje','w-descripcion','w-empresa','w-rut','w-empresa-pais','w-direccion','w-firmante-nombre','w-firmante-cargo','w-firmante-email'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.classList.remove('invalid');}});
   const sel=document.getElementById('w-tipo');if(sel)sel.value='';
   document.getElementById('nda-sent-msg').style.display='none';
@@ -696,7 +699,9 @@ function buildScore(){
   const lbl={alta:'Alta compatibilidad',media:'Compatibilidad media',baja:'Compatibilidad baja'}[niv];
   const rec={alta:'Se recomienda avanzar con la evaluación técnica y firma del NDA.',media:'Se recomienda continuar. Loop Hydrometallurgy analizará el caso específico.',baja:'Se recomienda consultar con Innsimple antes de continuar.'}[niv];
   _wizData.score={niv,lbl,rec};
-  document.getElementById('score-result').innerHTML=`<div class="score-box ${niv}"><div class="score-lbl">Compatibilidad con Halion Loop™</div><div class="score-val ${niv}">${lbl}</div><div class="score-pts">${pts.map(p=>`<div class="score-pt"><span>${p.i}</span><span>${p.t}</span></div>`).join('')}</div></div><div class="score-rec">${rec}</div>`;
+  const techLabel=_wizTech.nombre||'la tecnología seleccionada';
+  const empresaLabel=_wizTech.empresa?` — ${_wizTech.empresa}`:'';
+  document.getElementById('score-result').innerHTML=`<div class="score-box ${niv}"><div class="score-lbl">Compatibilidad con ${techLabel}${empresaLabel}</div><div class="score-val ${niv}">${lbl}</div><div class="score-pts">${pts.map(p=>`<div class="score-pt"><span>${p.i}</span><span>${p.t}</span></div>`).join('')}</div></div><div class="score-rec">${rec}</div>`;
 }
 function refreshNDA(){
   const emp=document.getElementById('w-empresa')?.value||'[Empresa]';
@@ -729,9 +734,10 @@ function sendNDAEmail(){
 async function saveProject(){
   if(!currentUser)return;
   try{
-    await db.collection('proyectos').add({userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',nombre:_wizData.proyecto,pais:_wizData.pais,tipoMineral:_wizData.tipo,ley:_wizData.ley,tonelaje:_wizData.tonelaje,descripcion:_wizData.descripcion||'',tecnologia:'halion-loop',scoreCompatibilidad:_wizData.score?.niv||'',estado:'nda_enviado',empresa:_wizData.empresa||{},firmante:_wizData.firmante||{},datosTecnicos:_wizData.tecnico||{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('proyectos').add({userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',nombre:_wizData.proyecto,pais:_wizData.pais,tipoMineral:_wizData.tipo,ley:_wizData.ley,tonelaje:_wizData.tonelaje,descripcion:_wizData.descripcion||'',tecnologia:_wizTech.nombre||'',empresa_tech:_wizTech.empresa||'',scoreCompatibilidad:_wizData.score?.niv||'',estado:'nda_enviado',empresa:_wizData.empresa||{},firmante:_wizData.firmante||{},datosTecnicos:_wizData.tecnico||{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     fetch('https://formspree.io/f/xeedoled',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
       tipo:'🚀 Nuevo proyecto de innovación — acción requerida',
+      tecnologia:`${_wizTech.nombre||'—'} (${_wizTech.empresa||'—'})`,
       '— PROYECTO —':'',
       proyecto:_wizData.proyecto,
       pais:_wizData.pais,
