@@ -485,42 +485,39 @@ function ps(x){
   const j = JSON.parse(
     x.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]
   );
-
   if(!j.table || !j.table.rows || !j.table.rows.length) return [];
 
-  const rawHeaders = j.table.cols.map(col =>
-    String(col.label || col.id || '').trim().toLowerCase().replace(/\s+/g, '_')
-  );
+  const rawLabels = j.table.cols.map(col => String(col.label || col.id || '').trim());
 
-  // Usamos primera fila como headers cuando:
-  // 1. Google devuelve letras genéricas (a,b,c...)
-  // 2. Los labels tienen header+datos concatenados (más de 3 guiones bajos = múltiples palabras)
-  const useFirstRow =
-    rawHeaders.every(h => /^[a-z]$/.test(h)) ||
-    rawHeaders.some(h => h.split('_').length > 3);
-
-  if (useFirstRow) {
+  // Caso 1: gviz devuelve letras genéricas (A,B,C) → primera fila como headers
+  if(rawLabels.every(h => /^[A-Za-z]$/.test(h))){
     const headers = j.table.rows[0].c.map(cell =>
-      String(cell?.v || '').trim().toLowerCase().replace(/\s+/g, '_')
+      String(cell?.v||'').trim().toLowerCase().replace(/\s+/g,'_')
     );
-    return j.table.rows.slice(1).map(row => {
-      const obj = {};
-      headers.forEach((h, i) => {
-        if(!h) return;
-        const cell = row.c[i];
-        obj[h] = cell?.v ?? cell?.f ?? '';
-      });
+    return j.table.rows.slice(1).map(row=>{
+      const obj={};
+      headers.forEach((h,i)=>{if(h){const c=row.c[i];obj[h]=c?.v??c?.f??'';}});
       return obj;
     });
   }
 
-  // Caso normal: labels son los nombres reales de columnas
-  return j.table.rows.map(row => {
-    const obj = {};
-    rawHeaders.forEach((h, i) => {
-      const cell = row.c[i];
-      obj[h] = cell?.v ?? cell?.f ?? '';
-    });
+  // Caso 2: labels son "columna dato1 dato2..." (gviz concatena header+datos)
+  // → extraer solo la primera palabra del label como nombre de campo
+  // Caso 3: labels son nombres reales de columna (sin espacios o con underscore)
+  // → usar el label completo
+  const isConcatenated = rawLabels.some(l => l.split(' ').length > 2);
+
+  const headers = rawLabels.map(label=>{
+    if(isConcatenated){
+      // Tomar primera palabra como nombre de columna
+      return label.split(' ')[0].toLowerCase().replace(/[^a-z0-9_]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'');
+    }
+    return label.trim().toLowerCase().replace(/\s+/g,'_');
+  });
+
+  return j.table.rows.map(row=>{
+    const obj={};
+    headers.forEach((h,i)=>{const c=row.c[i];obj[h]=c?.v??c?.f??'';});
     return obj;
   });
 }
