@@ -764,7 +764,15 @@ function buildConfirm(){
   const scC={alta:'var(--green)',media:'var(--gold)',baja:'var(--red)'}[sc.niv]||'var(--muted)';
   document.getElementById('proj-confirm').innerHTML=`<div style="text-align:center;padding:.8rem 0 .5rem"><div style="font-size:2rem">🎉</div><div style="font-size:.78rem;color:var(--muted);margin-top:.3rem">Proyecto registrado en Innsimple</div></div><div class="conf-box"><div class="conf-row"><span class="conf-lbl">Proyecto</span><span class="conf-val">${_wizData.proyecto}</span></div><div class="conf-row"><span class="conf-lbl">Empresa</span><span class="conf-val">${_wizData.empresa?.nombre}</span></div><div class="conf-row"><span class="conf-lbl">Mineral</span><span class="conf-val">${tipoLbl}</span></div><div class="conf-row"><span class="conf-lbl">Compatibilidad</span><span class="conf-val" style="color:${scC};font-family:'IBM Plex Mono'">${sc.lbl||'—'}</span></div><div class="conf-row"><span class="conf-lbl">NDA</span><span class="conf-val">Enviado a ${_wizData.firmante?.nombre}</span></div><div class="conf-row"><span class="conf-lbl">Estado</span><span class="conf-val"><span class="status-badge">Pendiente firma NDA</span></span></div></div><div style="font-size:.7rem;color:var(--muted);line-height:1.65;margin-top:.8rem;padding:.6rem .8rem;background:var(--bg2);border-radius:7px"><strong style="color:var(--dark)">Próximos pasos</strong><br>1. ${_wizData.firmante?.nombre} (${_wizData.firmante?.cargo}) firma el NDA<br>2. Innsimple coordina el envío de datos técnicos a Loop Hydrometallurgy<br>3. Loop evalúa compatibilidad y propone el siguiente paso</div>`;
 }
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('wizard-modal')?.addEventListener('click',function(e){if(e.target===this)closeWizard();});});
+document.addEventListener('DOMContentLoaded',()=>{
+  const wm=document.getElementById('wizard-modal');
+  if(wm){
+    wm.addEventListener('click',function(e){if(e.target===this)closeWizard();});
+    wm.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();}
+    });
+  }
+});
 function toggleNav(){const ul=document.getElementById('nav-links');const btn=document.getElementById('nav-toggle');ul.classList.toggle('open');btn.classList.toggle('open');}
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('nav-links').querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{document.getElementById('nav-links').classList.remove('open');document.getElementById('nav-toggle').classList.remove('open');}));});
 let _activeStage=null;
