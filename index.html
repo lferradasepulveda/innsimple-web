@@ -594,26 +594,47 @@ async function iB(){
 // ── Migración única desde Google Sheets ───────────────────
 // Llama migrateFromSheets() desde la consola del navegador estando logueado
 window.migrateFromSheets=async function(){
-  const shUrl=t=>`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(t)}`;
-  const fetchSheet=async t=>{const r=await fetch(shUrl(t));return ps(await r.text());};
-  // Limpia undefined y strings vacíos de un objeto
+  // Parsea CSV respetando comillas y saltos de línea dentro de celdas
+  function parseCSV(text){
+    const rows=[];let cur=[],cell='',inQ=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i],nx=text[i+1];
+      if(ch==='"'){if(inQ&&nx==='"'){cell+='"';i++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){cur.push(cell.trim());cell='';}
+      else if((ch==='\n'||ch==='\r')&&!inQ){
+        if(ch==='\r'&&nx==='\n')i++;
+        cur.push(cell.trim());rows.push(cur);cur=[];cell='';
+      }else cell+=ch;
+    }
+    if(cell||cur.length)cur.push(cell.trim());
+    if(cur.length&&cur.some(v=>v))rows.push(cur);
+    if(!rows.length)return[];
+    const headers=rows[0].map(h=>h.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,''));
+    return rows.slice(1).filter(r=>r.some(v=>v)).map(r=>{
+      const obj={};headers.forEach((h,i)=>{if(h)obj[h]=r[i]??'';});return obj;
+    });
+  }
+  const fetchSheet=async name=>{
+    const url=`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+    const r=await fetch(url);const text=await r.text();
+    return parseCSV(text);
+  };
   const clean=obj=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>k&&k!=='undefined'&&v!==undefined&&v!==null&&v!==''));
   console.log('🚀 Iniciando migración...');
   try{
-    // Limpiar colecciones antes de insertar para evitar duplicados
     for(const col of ['tecnologias','servicios','blog']){
       const snap=await db.collection(col).get();
       for(const doc of snap.docs)await doc.ref.delete();
       console.log(`🧹 ${col} limpiado (${snap.docs.length} docs)`);
     }
     const techs=await fetchSheet('Tecnologías');
+    console.log('📋 Tecnologías leídas:',techs.length);
     for(const t of techs){
       if(!t.nombre)continue;
       const doc=clean(t);
-      // Normalizar nombre del campo de bloque
-      if(!doc.bloque_web){doc.bloque_web=doc.bloque||doc.etapa||'';}
+      if(!doc.bloque_web)doc.bloque_web=doc.bloque||doc.etapa||'';
       await db.collection('tecnologias').add(doc);
-      console.log('✓ tech:',doc.nombre,'→ bloque_web:',doc.bloque_web);
+      console.log('✓',doc.nombre,'| visible:',doc.visible,'| bloque_web:',doc.bloque_web);
     }
     const svcs=await fetchSheet('Servicios');
     for(const s of svcs){if(!s.nombre)continue;await db.collection('servicios').add(clean(s));console.log('✓ servicio:',s.nombre);}
@@ -621,7 +642,7 @@ window.migrateFromSheets=async function(){
     for(const p of blog){if(!p.titulo)continue;await db.collection('blog').add(clean(p));console.log('✓ blog:',p.titulo);}
     const rows=await fetchSheet('Contenido');
     const c={};
-    rows.forEach(row=>{if(!row.seccion||!row.campo||row.seccion==='undefined'||row.campo==='undefined')return;if(!c[row.seccion])c[row.seccion]={};if(row.valor_es!==undefined&&row.valor_es!=='')c[row.seccion][row.campo]=row.valor_es;});
+    rows.forEach(row=>{if(!row.seccion||!row.campo)return;if(!c[row.seccion])c[row.seccion]={};if(row.valor_es)c[row.seccion][row.campo]=row.valor_es;});
     for(const[sec,data]of Object.entries(c)){if(!sec||!Object.keys(data).length)continue;await db.collection('contenido').doc(sec).set(clean(data));console.log('✓ contenido:',sec);}
     console.log('✅ Migración completada. Recarga la página.');
     alert('✅ Migración completada. Recarga la página.');
