@@ -567,7 +567,7 @@ async function iT(){
     const snap=await db.collection('tecnologias').where('visible','==','si').get();
     const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
     v.forEach(t=>{_techMap[t._id]=t;});
-    const b={};v.forEach(t=>{const s=t.bloque_web||t.bloque||t.etapa;if(!b[s])b[s]=[];b[s].push(t);});
+    const b={};v.forEach(t=>{const s=normStage(t.bloque_web||t.bloque||t.etapa);if(!b[s])b[s]=[];b[s].push(t);});
     drawSvgCounts(b);
     const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento'};
     Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});
