@@ -609,7 +609,8 @@ window.migrateFromSheets=async function(){
     if(cell||cur.length)cur.push(cell.trim());
     if(cur.length&&cur.some(v=>v))rows.push(cur);
     if(!rows.length)return[];
-    const headers=rows[0].map(h=>h.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,''));
+    // La primera fila del CSV gviz concatena header + datos → tomar solo primera palabra
+    const headers=rows[0].map(h=>h.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9_]/g,''));
     return rows.slice(1).filter(r=>r.some(v=>v)).map(r=>{
       const obj={};headers.forEach((h,i)=>{if(h)obj[h]=r[i]??'';});return obj;
     });
