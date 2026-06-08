@@ -564,8 +564,8 @@ function drawMapCounts(b){
 }
 async function iT(){
   try{
-    const snap=await db.collection('tecnologias').where('visible','==','si').get();
-    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    const snap=await db.collection('tecnologias').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()})).filter(t=>t.visible!=='no');
     v.forEach(t=>{_techMap[t._id]=t;});
     const b={};v.forEach(t=>{const s=normStage(t.bloque_web||t.bloque||t.etapa);if(!b[s])b[s]=[];b[s].push(t);});
     drawMapCounts(b);
@@ -575,7 +575,7 @@ async function iT(){
 }
 async function iS(){
   try{
-    const snap=await db.collection('servicios').where('visible','==','si').get();
+    const snap=await db.collection('servicios').get();
     const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
     const g=document.getElementById('svc-grid');if(!g)return;
     const cl=[{b:'var(--teal-l)',f:'var(--teal)'},{b:'var(--copper-l)',f:'var(--copper)'},{b:'rgba(26,138,72,.06)',f:'var(--green)'},{b:'rgba(34,96,212,.06)',f:'var(--blue)'},{b:'rgba(160,120,24,.06)',f:'var(--gold)'}];
@@ -584,8 +584,8 @@ async function iS(){
 }
 async function iB(){
   try{
-    const snap=await db.collection('blog').where('visible','==','si').get();
-    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
+    const snap=await db.collection('blog').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()})).filter(t=>t.visible!=='no');
     if(!v.length)return;
     document.getElementById('blog-section').style.display='block';
     document.getElementById('blog-grid').innerHTML=v.map(p=>`<a href="${p.url_linkedin||'#'}" target="_blank" rel="noopener" class="blog-card"><div class="blog-cat">${p.categoria||'Artículo'}</div><h3>${p.titulo}</h3><p>${p.resumen}</p>${p.fecha?`<div class="blog-date">${p.fecha}</div>`:''}</a>`).join('');
