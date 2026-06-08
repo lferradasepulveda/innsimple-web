@@ -87,7 +87,7 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 </style>
 </head>
 <body>
-<nav><div class="logo"><svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="#00c4cc" stroke-width="2.5"/><circle cx="20" cy="8" r="1.5" fill="none" stroke="#00c4cc" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#00c4cc"/></svg><div class="logo-w">Innsimple</div></div><ul id="nav-links"><li><a href="#flow" id="nl1">Mapa Tecnológico</a></li><li><a href="#services" id="nl2">Servicios</a></li><li><a href="#about" id="nl3">Nosotros</a></li><li id="nav-cta-li"><a href="#" class="nav-cta" id="nl4" onclick="openModal();return false;">Contacto</a></li></ul><div id="nav-user-chip" class="nav-user-chip"></div><button class="nav-hamburger" id="nav-toggle" aria-label="Menú" onclick="toggleNav()"><span></span><span></span><span></span></button></nav>
+<nav><div class="logo"><svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="#00c4cc" stroke-width="2.5"/><circle cx="20" cy="8" r="1.5" fill="none" stroke="#00c4cc" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#00c4cc"/></svg><div class="logo-w">Innsimple</div></div><ul id="nav-links"><li><a href="#flow" id="nl1">Mapa Tecnológico</a></li><li><a href="#services" id="nl2">Servicios</a></li><li><a href="#about" id="nl3">Nosotros</a></li><li id="nav-cta-li"><a href="#" class="nav-cta" id="nl4" onclick="openModal();return false;">Contacto</a></li><li id="nav-login-li"><a href="#" style="color:var(--teal);font-weight:600;font-size:.78rem" onclick="showAuthModal();return false;">Ingresar</a></li></ul><div id="nav-user-chip" class="nav-user-chip"></div><button class="nav-hamburger" id="nav-toggle" aria-label="Menú" onclick="toggleNav()"><span></span><span></span><span></span></button></nav>
 <section class="hero"><div class="hero-tag" id="hero-tag">◆ Transferencia Tecnológica para Minería</div><h1 id="hero-h1">Conectamos <span class="acc">innovación</span> con operaciones mineras</h1><p id="hero-p">Evaluamos, seleccionamos y facilitamos la adopción de tecnologías emergentes para el procesamiento de minerales.</p></section>
 <div class="tabs" id="flow"><button class="tab on">Cobre</button><button class="tab soon">Litio — pronto</button><button class="tab soon">Oro — pronto</button></div>
 <div class="flow-wrap"><div class="flow-title" id="flow-title">Cadena de proceso del cobre — selecciona una etapa</div>
@@ -458,13 +458,15 @@ function updateNavUser(user){
   const chip=document.getElementById('nav-user-chip');
   const ctaLi=document.getElementById('nav-cta-li');
   if(!chip)return;
+  const loginLi=document.getElementById('nav-login-li');
   if(user){
     const name=user.displayName||user.email.split('@')[0];
     const initial=name.charAt(0).toUpperCase();
     chip.style.display='flex';
     chip.innerHTML=`<div class="nav-user-inner" onclick="toggleUserMenu()"><div class="nav-user-initial">${initial}</div><span>${name}</span></div><div class="user-menu" id="user-menu"><button onclick="doLogout()">Cerrar sesión</button></div>`;
     if(ctaLi)ctaLi.style.display='none';
-  }else{chip.style.display='none';chip.innerHTML='';if(ctaLi)ctaLi.style.display='';}
+    if(loginLi)loginLi.style.display='none';
+  }else{chip.style.display='none';chip.innerHTML='';if(ctaLi)ctaLi.style.display='';if(loginLi)loginLi.style.display='';}
 }
 function toggleUserMenu(){const m=document.getElementById('user-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
 document.addEventListener('click',e=>{if(!e.target.closest('#nav-user-chip')){const m=document.getElementById('user-menu');if(m)m.style.display='none';}});
