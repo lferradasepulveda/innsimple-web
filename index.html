@@ -594,31 +594,27 @@ async function iB(){
 // ── Migración única desde Google Sheets ───────────────────
 // Llama migrateFromSheets() desde la consola del navegador estando logueado
 window.migrateFromSheets=async function(){
-  // Parsea CSV respetando comillas y saltos de línea dentro de celdas
-  function parseCSV(text){
-    const rows=[];let cur=[],cell='',inQ=false;
-    for(let i=0;i<text.length;i++){
-      const ch=text[i],nx=text[i+1];
-      if(ch==='"'){if(inQ&&nx==='"'){cell+='"';i++;}else inQ=!inQ;}
-      else if(ch===','&&!inQ){cur.push(cell.trim());cell='';}
-      else if((ch==='\n'||ch==='\r')&&!inQ){
-        if(ch==='\r'&&nx==='\n')i++;
-        cur.push(cell.trim());rows.push(cur);cur=[];cell='';
-      }else cell+=ch;
-    }
-    if(cell||cur.length)cur.push(cell.trim());
-    if(cur.length&&cur.some(v=>v))rows.push(cur);
-    if(!rows.length)return[];
-    // La primera fila del CSV gviz concatena header + datos → tomar solo primera palabra
-    const headers=rows[0].map(h=>h.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9_]/g,''));
-    return rows.slice(1).filter(r=>r.some(v=>v)).map(r=>{
-      const obj={};headers.forEach((h,i)=>{if(h)obj[h]=r[i]??'';});return obj;
+  // gviz JSON: labels concatenan header+datos → extraer solo primera palabra como clave
+  function parseGviz(text){
+    const j=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/)[1]);
+    if(!j.table||!j.table.rows||!j.table.rows.length)return[];
+    const headers=j.table.cols.map(col=>
+      String(col.label||col.id||'').trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9_]/g,'')
+    );
+    return j.table.rows.map(row=>{
+      const obj={};
+      headers.forEach((h,i)=>{
+        if(!h)return;
+        const c=row.c[i];
+        obj[h]=String(c?.v??c?.f??'').trim();
+      });
+      return obj;
     });
   }
   const fetchSheet=async name=>{
-    const url=`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
-    const r=await fetch(url);const text=await r.text();
-    return parseCSV(text);
+    const url=`https://docs.google.com/spreadsheets/d/${_MIG_SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;
+    const r=await fetch(url);
+    return parseGviz(await r.text());
   };
   const clean=obj=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>k&&k!=='undefined'&&v!==undefined&&v!==null&&v!==''));
   console.log('🚀 Iniciando migración...');
