@@ -116,7 +116,14 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="mrb-count" id="cnt-transv">— tecnologías</div>
     <span class="mrb-arrow">→</span>
   </div>
-  <div class="map-route-btn" style="border-color:rgba(34,96,212,.18);--route-color:var(--blue)" onclick="mapShowL2('digital')">
+  <div class="map-route-btn" style="border-color:rgba(160,120,24,.18)" onclick="mapShowL2('mina')">
+    <div class="mrb-label" style="color:var(--gold)">Mina</div>
+    <div class="mrb-title">Mina</div>
+    <div class="mrb-sub">Tecnologías de operación minera</div>
+    <div class="mrb-count" id="cnt-mina">— tecnologías</div>
+    <span class="mrb-arrow">→</span>
+  </div>
+  <div class="map-route-btn" style="border-color:rgba(34,96,212,.18)" onclick="mapShowL2('digital')">
     <div class="mrb-label" style="color:var(--blue)">Digitalización</div>
     <div class="mrb-title">Digitalización</div>
     <div class="mrb-sub">Automatización · IA · Gemelos digitales</div>
@@ -204,6 +211,14 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
   </div>
 </div>
 
+<!-- ── NIVEL 2: Mina ── -->
+<div id="map-l2-mina" class="map-l2" style="display:none">
+  <button class="map-back" onclick="mapShowL1()">← Volver</button>
+  <div class="map-flow">
+    <div class="map-fn" style="background:rgba(160,120,24,.07);color:var(--gold);border-color:rgba(160,120,24,.18)" data-stage="mina" onclick="sel2('mina')">Mina</div>
+  </div>
+</div>
+
 <!-- ── NIVEL 2: Digitalización ── -->
 <div id="map-l2-digital" class="map-l2" style="display:none">
   <button class="map-back" onclick="mapShowL1()">← Volver</button>
@@ -263,6 +278,10 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
   </div>
   <div class="panel" id="p-seguridad">
     <div class="p-hd"><h2>Seguridad — <span>Operacional e industrial</span></h2><div class="p-sub">Tecnologías para monitoreo de riesgos, protección de personas, detección temprana de fallas y operaciones remotas en entornos mineros.</div></div>
+    <div class="t-list"></div>
+  </div>
+  <div class="panel" id="p-mina">
+    <div class="p-hd"><h2>Mina — <span>Operación minera</span></h2><div class="p-sub">Tecnologías aplicadas a la operación de la mina.</div></div>
     <div class="t-list"></div>
   </div>
   <div class="panel" id="p-digitalizacion">
@@ -574,6 +593,7 @@ function normStage(s){
     'mantenimiento':'mantenimiento',
     'seguridad':'seguridad',
     'digitalización':'digitalizacion','digitalizacion':'digitalizacion','automatización':'digitalizacion','automatizacion':'digitalizacion','digital':'digitalizacion',
+    'mina':'mina',
     'conminución':'chancado','conminucion':'chancado','chancado':'chancado',
     'rutas emergentes':'halion','halion':'halion','lixiviación de sulfuros':'halion','lixiviacion de sulfuros':'halion'
   };
@@ -602,8 +622,10 @@ function drawMapCounts(b){
   const e1=document.getElementById('cnt-pyro');if(e1)e1.textContent=pyro+' tecnologías';
   const e2=document.getElementById('cnt-hydro');if(e2)e2.textContent=hydro+' tecnologías';
   const e3=document.getElementById('cnt-transv');if(e3)e3.textContent=transv+' tecnologías';
+  const mina=sum(['mina']);
+  const e4=document.getElementById('cnt-mina');if(e4)e4.textContent=mina+' tecnologías';
   const digital=sum(['digitalizacion']);
-  const e4=document.getElementById('cnt-digital');if(e4)e4.textContent=digital+' tecnologías';
+  const e5=document.getElementById('cnt-digital');if(e5)e5.textContent=digital+' tecnologías';
 }
 async function iT(){
   try{
@@ -612,7 +634,7 @@ async function iT(){
     v.forEach(t=>{_techMap[t._id]=t;});
     const b={};v.forEach(t=>{const s=normStage(t.bloque_web||t.bloque||t.etapa);if(!b[s])b[s]=[];b[s].push(t);});
     drawMapCounts(b);
-    const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento','seguridad':'p-seguridad','digitalizacion':'p-digitalizacion'};
+    const pm={'chancado':'p-chancado','flotacion':'p-flotacion','bio':'p-bio','lix-ac':'p-lix-ac','fundicion':'p-fundicion','eref':'p-eref','memb':'p-memb','sx-ew':'p-sx-ew','ix':'p-ix','precip':'p-precip','sustentabilidad':'p-sustentabilidad','mantenimiento':'p-mantenimiento','seguridad':'p-seguridad','mina':'p-mina','digitalizacion':'p-digitalizacion'};
     Object.keys(pm).forEach(s=>{const p=document.getElementById(pm[s]);if(!p||!b[s])return;let tl=p.querySelector('.t-list');if(tl)tl.innerHTML=b[s].map(mk).join('');});
   }catch(e){console.error('iT:',e);}
 }
@@ -855,14 +877,14 @@ document.addEventListener('DOMContentLoaded',()=>{document.getElementById('nav-l
 let _activeL3=null;
 function mapShowL1(){
   document.getElementById('map-l1').style.display='flex';
-  ['pyro','hydro','transv','digital'].forEach(r=>{const el=document.getElementById('map-l2-'+r);if(el)el.style.display='none';});
+  ['pyro','hydro','transv','mina','digital'].forEach(r=>{const el=document.getElementById('map-l2-'+r);if(el)el.style.display='none';});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.map-fn').forEach(el=>el.classList.remove('active'));
   _activeL3=null;
 }
 function mapShowL2(route){
   document.getElementById('map-l1').style.display='none';
-  ['pyro','hydro','transv','digital'].forEach(r=>{const el=document.getElementById('map-l2-'+r);if(el)el.style.display=r===route?'block':'none';});
+  ['pyro','hydro','transv','mina','digital'].forEach(r=>{const el=document.getElementById('map-l2-'+r);if(el)el.style.display=r===route?'block':'none';});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.map-fn').forEach(el=>el.classList.remove('active'));
   _activeL3=null;
