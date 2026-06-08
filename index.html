@@ -795,8 +795,8 @@ function drawMapCounts(b){
 }
 async function iT(){
   try{
-    const snap=await db.collection('tecnologias').get();
-    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()})).filter(t=>t.visible!=='no');
+    const snap=await db.collection('tecnologias').where('visible','==','si').get();
+    const v=snap.docs.map(doc=>({_id:doc.id,...doc.data()}));
     v.forEach(t=>{_techMap[t._id]=t;});
     const b={};v.forEach(t=>{const s=normStage(t.bloque_web||t.bloque||t.etapa);if(!b[s])b[s]=[];b[s].push(t);});
     drawMapCounts(b);
