@@ -321,6 +321,47 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <section class="blog-section" id="blog-section"><div class="sec-label">Publicaciones</div><div class="sec-title">Lo que estamos pensando</div><div class="sec-sub">Artículos sobre innovación y procesamiento de minerales.</div><div class="blog-grid" id="blog-grid"></div></section>
 <section class="cta"><div class="cta-box"><h2 id="cta-h">¿Tienes un desafío de procesamiento?</h2><p id="cta-p">Evaluamos la compatibilidad técnica entre tu mineral y las tecnologías disponibles.</p><button class="cta-btn" id="cta-btn" onclick="openModal()">Conversemos →</button></div></section>
 <footer><p id="footer-t">© 2026 Innsimple SpA — Transferencia Tecnológica para Minería — Chile</p></footer>
+
+<!-- ── Modal formulario inteligente ── -->
+<div class="modal-bg" id="smart-modal">
+  <div class="wizard">
+    <div class="wiz-hd">
+      <div class="wiz-steps">
+        <div class="wiz-dot on" id="sdot-1">1</div><div class="wiz-line"></div>
+        <div class="wiz-dot" id="sdot-2">2</div><div class="wiz-line"></div>
+        <div class="wiz-dot" id="sdot-3">3</div>
+      </div>
+      <button class="wiz-close" onclick="closeSmartForm()">✕</button>
+    </div>
+    <div class="wiz-body">
+      <!-- Paso 1: Base -->
+      <div class="wiz-s on" id="ss1">
+        <div class="wiz-title">Tu proyecto</div>
+        <div class="wiz-sub" id="s-tech-label">Cuéntanos sobre tu operación</div>
+        <div><div class="wiz-lbl">Nombre del proyecto / operación</div><input class="wiz-inp" id="s-proyecto" type="text" placeholder="Ej: Proyecto Cobre Norte"/></div>
+        <div><div class="wiz-lbl">País</div><input class="wiz-inp" id="s-pais" type="text" placeholder="Chile"/></div>
+        <div><div class="wiz-lbl">Empresa</div><input class="wiz-inp" id="s-empresa" type="text" placeholder="Nombre de tu empresa"/></div>
+        <div><div class="wiz-lbl">Descripción del desafío</div><textarea class="wiz-inp wiz-ta" id="s-desafio" placeholder="¿Qué problema buscas resolver con esta tecnología?"></textarea></div>
+      </div>
+      <!-- Paso 2: Dinámico -->
+      <div class="wiz-s" id="ss2">
+        <div class="wiz-title" id="s-cat-title">Datos técnicos</div>
+        <div class="wiz-sub" id="s-cat-sub">Información específica para evaluar la compatibilidad</div>
+        <div id="s-dynamic-fields"></div>
+      </div>
+      <!-- Paso 3: Confirmación -->
+      <div class="wiz-s" id="ss3">
+        <div class="wiz-title">¡Proyecto registrado!</div>
+        <div id="s-confirm"></div>
+      </div>
+    </div>
+    <div class="wiz-foot">
+      <button class="wiz-back" id="s-back-btn" onclick="smartBack()" style="visibility:hidden">← Atrás</button>
+      <button class="wiz-next-btn" id="s-next-btn" onclick="smartNext()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="wizard-modal">
   <div class="wizard">
     <div class="wiz-hd">
@@ -578,7 +619,130 @@ function ps(x){
 }
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
 const _techMap={};
-function openWizardForTech(id){requireAuth(()=>openWizard(_techMap[id]||{}));}
+// ── Formularios inteligentes por categoría ────────────────
+const _STAGE_CAT={
+  'chancado':'conminucion','flotacion':'hidromet','bio':'hidromet',
+  'lix-ac':'hidromet','memb':'hidromet','sx-ew':'hidromet','ix':'hidromet','precip':'hidromet',
+  'fundicion':'pirometalurgia','eref':'pirometalurgia',
+  'sustentabilidad':'sustentabilidad','mantenimiento':'mantenimiento',
+  'seguridad':'seguridad','digitalizacion':'digitalizacion','mina':'mina','halion':'halion'
+};
+const _CAT_CONFIG={
+  conminucion:{title:'Datos de conminución',sub:'Parámetros del circuito de chancado y molienda',fields:[
+    {id:'ley',label:'Ley del mineral (%Cu)',ph:'Ej: 1.2% Cu'},
+    {id:'p80_feed',label:'P80 feed (mm)',ph:'Ej: 200 mm'},
+    {id:'p80_producto',label:'P80 producto requerido (μm)',ph:'Ej: 150 μm'},
+    {id:'tonelaje',label:'Tonelaje (t/día)',ph:'Ej: 50000'}
+  ]},
+  hidromet:{title:'Datos hidrometalúrgicos',sub:'Parámetros del mineral y proceso de recuperación',fields:[
+    {id:'ley',label:'Ley del mineral (%Cu)',ph:'Ej: 1.2% Cu'},
+    {id:'mineralogia',label:'Mineralogía principal',ph:'Ej: Calcopirita 65%, Pirita 20%...'},
+    {id:'p80',label:'P80 requerido (μm)',ph:'Ej: 150 μm'},
+    {id:'tonelaje',label:'Tonelaje (t/mes)',ph:'Ej: 5000'}
+  ]},
+  pirometalurgia:{title:'Datos pirometalúrgicos',sub:'Parámetros del concentrado y proceso térmico',fields:[
+    {id:'cu_concentrado',label:'%Cu en concentrado/blíster',ph:'Ej: 28% Cu'},
+    {id:'produccion',label:'Producción mensual (TMS)',ph:'Ej: 3500'},
+    {id:'impurezas',label:'Impurezas clave',ph:'Ej: As 0.3%, Sb 0.1%, Bi 0.05%'}
+  ]},
+  mantenimiento:{title:'Datos de mantenimiento',sub:'Información del equipo e historial de fallas',fields:[
+    {id:'tipo_equipo',label:'Tipo de equipo',ph:'Ej: Molino SAG, Bomba centrífuga...'},
+    {id:'frecuencia_falla',label:'Frecuencia de falla estimada',ph:'Ej: 2 veces/mes'},
+    {id:'criticidad',label:'Criticidad del equipo',type:'select',opts:['Alta','Media','Baja']},
+    {id:'horas_operacion',label:'Horas de operación continua',ph:'Ej: 6000 hrs/año'}
+  ]},
+  sustentabilidad:{title:'Datos ambientales',sub:'Parámetros actuales de consumo y emisiones',fields:[
+    {id:'consumo_hidrico',label:'Consumo hídrico actual (m³/día)',ph:'Ej: 500'},
+    {id:'fuente_agua',label:'Fuente de agua principal',ph:'Ej: Agua de mar, Río, Relave...'},
+    {id:'objetivo',label:'Objetivo principal',ph:'Ej: Reducir consumo agua, bajar emisiones CO₂...'}
+  ]},
+  seguridad:{title:'Datos de seguridad',sub:'Contexto del riesgo en tu operación',fields:[
+    {id:'tipo_riesgo',label:'Tipo de riesgo principal',ph:'Ej: Caída de rocas, Gases tóxicos, Tráfico...'},
+    {id:'trabajadores',label:'N° trabajadores expuestos',ph:'Ej: 50'},
+    {id:'area',label:'Área de la operación',ph:'Ej: Chancado, Mina subterránea, Planta...'}
+  ]},
+  digitalizacion:{title:'Datos de digitalización',sub:'Infraestructura tecnológica actual',fields:[
+    {id:'sistema_actual',label:'Sistema de control actual',ph:'Ej: DCS Honeywell, PLC Siemens...'},
+    {id:'sensores',label:'N° sensores / volumen de datos',ph:'Ej: 500 sensores, 2 GB/día'},
+    {id:'conectividad',label:'Conectividad disponible',ph:'Ej: Fibra óptica, WiFi industrial, 4G'},
+    {id:'objetivo_digital',label:'Objetivo principal',ph:'Ej: Predecir fallas, optimizar consumo energía...'}
+  ]},
+  mina:{title:'Datos de operación mina',sub:'Parámetros del método y producción',fields:[
+    {id:'metodo',label:'Método de explotación',type:'select',opts:['Rajo abierto','Subterránea','Mixto']},
+    {id:'produccion_diaria',label:'Producción diaria (ton)',ph:'Ej: 80000'},
+    {id:'tipo_roca',label:'Tipo de roca / dureza',ph:'Ej: Roca dura, BWi 18 kWh/t'}
+  ]}
+};
+let _smartStep=1,_smartTech={},_smartData={};
+function openWizardForTech(id){
+  const tech=_techMap[id]||{};
+  const stage=normStage(tech.bloque_web||tech.bloque||tech.etapa||'');
+  const cat=_STAGE_CAT[stage]||'hidromet';
+  if(cat==='halion'){requireAuth(()=>openWizard(tech));return;}
+  requireAuth(()=>openSmartForm(tech,cat));
+}
+function openSmartForm(tech,cat){
+  _smartTech=tech;_smartStep=1;_smartData={};
+  // Título paso 1
+  document.getElementById('s-tech-label').textContent='Tecnología: '+tech.nombre;
+  // Render campos dinámicos
+  const cfg=_CAT_CONFIG[cat]||_CAT_CONFIG.hidromet;
+  document.getElementById('s-cat-title').textContent=cfg.title;
+  document.getElementById('s-cat-sub').textContent=cfg.sub;
+  const container=document.getElementById('s-dynamic-fields');
+  container.innerHTML=cfg.fields.map(f=>{
+    if(f.type==='select')return`<div><div class="wiz-lbl">${f.label}</div><select class="wiz-inp" id="sf-${f.id}">${f.opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`;
+    return`<div><div class="wiz-lbl">${f.label}</div><input class="wiz-inp" id="sf-${f.id}" type="text" placeholder="${f.ph}"/></div>`;
+  }).join('');
+  // Reset steps
+  ['ss1','ss2','ss3'].forEach((s,i)=>{document.getElementById(s).classList.toggle('on',i===0);});
+  [1,2,3].forEach(i=>{const d=document.getElementById('sdot-'+i);d.classList.remove('on','done');if(i===1)d.classList.add('on');});
+  document.getElementById('s-back-btn').style.visibility='hidden';
+  document.getElementById('s-next-btn').textContent='Siguiente →';
+  document.getElementById('smart-modal').classList.add('show');
+}
+function closeSmartForm(){document.getElementById('smart-modal').classList.remove('show');}
+function smartUpdateUI(){
+  ['ss1','ss2','ss3'].forEach((s,i)=>{document.getElementById(s).classList.toggle('on',i===_smartStep-1);});
+  [1,2,3].forEach(i=>{const d=document.getElementById('sdot-'+i);d.classList.remove('on','done');if(i<_smartStep)d.classList.add('done');else if(i===_smartStep)d.classList.add('on');});
+  document.getElementById('s-back-btn').style.visibility=_smartStep===1?'hidden':'visible';
+  document.getElementById('s-next-btn').textContent=_smartStep===2?'Enviar proyecto →':_smartStep===3?'Cerrar':'Siguiente →';
+}
+function smartVal(ids){let ok=true;ids.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('invalid');if(!el.value.trim()){el.classList.add('invalid');ok=false;}}});return ok;}
+async function smartNext(){
+  if(_smartStep===1){
+    if(!smartVal(['s-proyecto','s-pais','s-empresa']))return;
+    _smartData.base={proyecto:document.getElementById('s-proyecto').value.trim(),pais:document.getElementById('s-pais').value.trim(),empresa:document.getElementById('s-empresa').value.trim(),desafio:document.getElementById('s-desafio').value.trim()};
+    _smartStep=2;
+  } else if(_smartStep===2){
+    const inputs=document.querySelectorAll('#s-dynamic-fields .wiz-inp');
+    const tecnico={};inputs.forEach(el=>{const key=el.id.replace('sf-','');tecnico[key]=el.value.trim();});
+    _smartData.tecnico=tecnico;
+    await saveSmartProject();
+    buildSmartConfirm();
+    _smartStep=3;
+  } else if(_smartStep===3){closeSmartForm();return;}
+  smartUpdateUI();
+}
+function smartBack(){if(_smartStep>1){_smartStep--;smartUpdateUI();}}
+async function saveSmartProject(){
+  if(!currentUser)return;
+  try{
+    await db.collection('proyectos').add({
+      userId:currentUser.uid,userEmail:currentUser.email,userName:currentUser.displayName||'',
+      tecnologia:_smartTech.nombre||'',etapa:_smartTech.bloque_web||'',
+      ...(_smartData.base||{}),datosTecnicos:_smartData.tecnico||{},
+      estado:'nuevo',createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    fetch('https://formspree.io/f/xeedoled',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({tipo:'🚀 Nuevo proyecto',tecnologia:_smartTech.nombre,..._smartData.base,..._smartData.tecnico,usuario:currentUser.email})
+    }).catch(e=>console.warn('Formspree:',e));
+  }catch(e){console.error('saveSmartProject:',e);}
+}
+function buildSmartConfirm(){
+  document.getElementById('s-confirm').innerHTML=`<div style="text-align:center;padding:.8rem 0 .5rem"><div style="font-size:2rem">🎉</div><div style="font-size:.78rem;color:var(--muted);margin-top:.3rem">Proyecto registrado</div></div><div class="conf-box"><div class="conf-row"><span class="conf-lbl">Proyecto</span><span class="conf-val">${_smartData.base?.proyecto}</span></div><div class="conf-row"><span class="conf-lbl">Tecnología</span><span class="conf-val">${_smartTech.nombre||'—'}</span></div><div class="conf-row"><span class="conf-lbl">Empresa</span><span class="conf-val">${_smartData.base?.empresa}</span></div></div><div style="font-size:.7rem;color:var(--muted);line-height:1.65;margin-top:.8rem;padding:.6rem .8rem;background:var(--bg2);border-radius:7px">El equipo de Innsimple revisará tu proyecto y se contactará pronto.</div>`;
+}
+document.addEventListener('DOMContentLoaded',()=>{const sm=document.getElementById('smart-modal');if(sm)sm.addEventListener('click',function(e){if(e.target===this)closeSmartForm();});});
 function normStage(s){
   const raw=String(s||'').trim();
   const map={
