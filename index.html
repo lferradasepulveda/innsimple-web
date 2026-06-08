@@ -539,6 +539,27 @@ function ps(x){
 function tc(n){const s=(n||'').toLowerCase();return s==='alta'?'trl-h':s==='baja'?'trl-l':'trl-m';}
 const _techMap={};
 function openWizardForTech(id){requireAuth(()=>openWizard(_techMap[id]||{}));}
+function normStage(s){
+  const raw=String(s||'').trim();
+  const map={
+    'flotación':'flotacion','flotacion':'flotacion',
+    'biolixiviación':'bio','biolixiviacion':'bio','bio':'bio',
+    'lixiviación':'lix-ac','lixiviacion':'lix-ac','lixiviación ácida':'lix-ac','lixiviacion acida':'lix-ac','lix-ac':'lix-ac',
+    'fundición':'fundicion','fundicion':'fundicion',
+    'electrorefinación':'eref','electrorefinacion':'eref','eref':'eref',
+    'membranas':'memb','memb':'memb',
+    'sx-ew':'sx-ew','sxew':'sx-ew','sx ew':'sx-ew','extracción por solventes':'sx-ew',
+    'intercambio iónico':'ix','intercambio ionico':'ix','ix':'ix',
+    'precipitación':'precip','precipitacion':'precip','precip':'precip',
+    'sustentabilidad':'sustentabilidad',
+    'mantenimiento':'mantenimiento',
+    'seguridad':'seguridad',
+    'conminución':'chancado','conminucion':'chancado','chancado':'chancado',
+    'rutas emergentes':'halion','halion':'halion','lixiviación de sulfuros':'halion','lixiviacion de sulfuros':'halion'
+  };
+  const k=raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  return map[raw.toLowerCase()]||map[k]||k;
+}
 function mk(t){let k='';if(t.kpi1_label&&t.kpi1_valor)k+=`<div><div class="kp-l">${t.kpi1_label}</div><div class="kp-v">${t.kpi1_valor}</div></div>`;if(t.kpi2_label&&t.kpi2_valor)k+=`<div><div class="kp-l">${t.kpi2_label}</div><div class="kp-v">${t.kpi2_valor}</div></div>`;return`<div class="tc"><div class="tc-top"><div><h3>${t.nombre}</h3><div class="co">${t.empresa}</div></div><div class="trl ${tc(t.trl_nivel)}">${t.trl}</div></div><p>${t.descripcion}</p>${k?`<div class="kpis">${k}</div>`:''}<button class="ev-btn" onclick="openWizardForTech('${t._id}')">Crear proyecto →</button></div>`;}
 async function iC(){
   try{
