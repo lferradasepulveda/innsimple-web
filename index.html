@@ -135,13 +135,13 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="l2-route">
       <div class="l2-rlabel pyro">Ruta pirometalúrgica</div>
       <div class="l2-flow">
-        <div class="l2-node nd-gray" onclick="sel2('chancado')">Conminución</div>
+        <div class="l2-node nd-gray" data-stage="chancado" onclick="sel2('chancado')">Conminución</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-pyro" onclick="sel2('flotacion')">Flotación</div>
+        <div class="l2-node nd-pyro" data-stage="flotacion" onclick="sel2('flotacion')">Flotación</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-pyro" onclick="sel2('fundicion')">Fundición</div>
+        <div class="l2-node nd-pyro" data-stage="fundicion" onclick="sel2('fundicion')">Fundición</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-pyro" onclick="sel2('eref')">Electrorefinación</div>
+        <div class="l2-node nd-pyro" data-stage="eref" onclick="sel2('eref')">Electrorefinación</div>
         <div class="l2-arr">→</div>
         <div class="l2-node nd-gray" style="font-weight:800">Cátodo Cu 99.99%</div>
       </div>
@@ -153,11 +153,11 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="l2-route">
       <div class="l2-rlabel hydro">Ruta tradicional — óxidos y secundarios</div>
       <div class="l2-flow">
-        <div class="l2-node nd-gray" onclick="sel2('chancado')">Conminución</div>
+        <div class="l2-node nd-gray" data-stage="chancado" onclick="sel2('chancado')">Conminución</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-hydro" onclick="sel2('lix-ac')">Lixiviación</div>
+        <div class="l2-node nd-hydro" data-stage="lix-ac" onclick="sel2('lix-ac')">Lixiviación</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-blue" onclick="sel2('sx-ew')">SX-EW</div>
+        <div class="l2-node nd-blue" data-stage="sx-ew" onclick="sel2('sx-ew')">SX-EW</div>
         <div class="l2-arr">→</div>
         <div class="l2-node nd-gray" style="font-weight:800">Cátodo Cu</div>
       </div>
@@ -165,11 +165,11 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="l2-route">
       <div class="l2-rlabel hydro">Biolixiviación — sulfuros secundarios</div>
       <div class="l2-flow">
-        <div class="l2-node nd-gray" onclick="sel2('chancado')">Conminución</div>
+        <div class="l2-node nd-gray" data-stage="chancado" onclick="sel2('chancado')">Conminución</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-teal" onclick="sel2('bio')">Biolixiviación</div>
+        <div class="l2-node nd-teal" data-stage="bio" onclick="sel2('bio')">Biolixiviación</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-blue" onclick="sel2('sx-ew')">SX-EW</div>
+        <div class="l2-node nd-blue" data-stage="sx-ew" onclick="sel2('sx-ew')">SX-EW</div>
         <div class="l2-arr">→</div>
         <div class="l2-node nd-gray" style="font-weight:800">Cátodo Cu</div>
       </div>
@@ -177,11 +177,11 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="l2-route">
       <div class="l2-rlabel emerging">Rutas emergentes — sulfuros primarios</div>
       <div class="l2-flow">
-        <div class="l2-node nd-gray" onclick="sel2('chancado')">Conminución</div>
+        <div class="l2-node nd-gray" data-stage="chancado" onclick="sel2('chancado')">Conminución</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-teal" onclick="sel2('halion')">Lix. Sulfuros / Haluros</div>
+        <div class="l2-node nd-teal" data-stage="halion" onclick="sel2('halion')">Lix. Sulfuros / Haluros</div>
         <div class="l2-arr">→</div>
-        <div class="l2-node nd-blue" onclick="sel2('sx-ew')">SX-EW</div>
+        <div class="l2-node nd-blue" data-stage="sx-ew" onclick="sel2('sx-ew')">SX-EW</div>
         <div class="l2-arr">→</div>
         <div class="l2-node nd-gray" style="font-weight:800">Cátodo Cu</div>
       </div>
@@ -189,11 +189,11 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
     <div class="l2-route">
       <div class="l2-rlabel hydro" style="opacity:.7">Purificación avanzada (combinables)</div>
       <div class="l2-flow">
-        <div class="l2-node nd-blue" onclick="sel2('memb')">Membranas</div>
+        <div class="l2-node nd-blue" data-stage="memb" onclick="sel2('memb')">Membranas</div>
         <div class="l2-arr">·</div>
-        <div class="l2-node nd-purple" onclick="sel2('ix')">Intercambio iónico</div>
+        <div class="l2-node nd-purple" data-stage="ix" onclick="sel2('ix')">Intercambio iónico</div>
         <div class="l2-arr">·</div>
-        <div class="l2-node nd-purple" onclick="sel2('precip')">Precipitación</div>
+        <div class="l2-node nd-purple" data-stage="precip" onclick="sel2('precip')">Precipitación</div>
       </div>
     </div>
   </div>
@@ -650,6 +650,19 @@ function drawMapCounts(b){
     'cnt-dig':  sum(['digitalizacion']),
   };
   Object.entries(counts).forEach(([id,n])=>{const el=document.getElementById(id);if(el)el.textContent=n+' tecs';});
+  // Inyectar conteo en cada nodo L2 con data-stage
+  document.querySelectorAll('.l2-node[data-stage]').forEach(nd=>{
+    const s=nd.dataset.stage;
+    const n=b[s]?b[s].length:0;
+    if(!n)return;
+    // evitar duplicar badge si ya existe
+    if(nd.querySelector('.l2-cnt'))return;
+    const badge=document.createElement('span');
+    badge.className='l2-cnt';
+    badge.textContent=n;
+    badge.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:100px;background:rgba(0,0,0,.15);color:inherit;font-size:.52rem;font-family:"IBM Plex Mono",monospace;font-weight:700;margin-left:.35rem;padding:0 .28rem;';
+    nd.appendChild(badge);
+  });
 }
 async function iT(){
   try{
