@@ -57,7 +57,8 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 .l1c{border-radius:10px;padding:.9rem .7rem;cursor:pointer;border:1.5px solid var(--border);background:var(--card);transition:all .22s;text-align:center;position:relative}
 .l1c:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
 .l1c.on{border-width:2px}
-.l1c-ico{font-size:1.3rem;margin-bottom:.3rem}
+.l1c-ico{display:flex;justify-content:center;margin-bottom:.35rem;opacity:.75}.l1c-ico svg{transition:transform .2s}.l1c:hover .l1c-ico svg{transform:scale(1.1)}
+.l1c-pyro .l1c-ico{color:var(--pyro)}.l1c-hydro .l1c-ico{color:var(--hydro)}.l1c-sust .l1c-ico{color:var(--green)}.l1c-mant .l1c-ico{color:var(--gold)}.l1c-mina .l1c-ico{color:var(--blue)}.l1c-seg .l1c-ico{color:var(--orange)}.l1c-dig .l1c-ico{color:var(--teal)}
 .l1c-name{font-size:.72rem;font-weight:700;line-height:1.2;margin-bottom:.25rem}
 .l1c-cnt{font-size:.58rem;font-family:'IBM Plex Mono';font-weight:600;opacity:.7}
 .l1c-pyro{border-color:rgba(152,40,56,.2);}.l1c-pyro.on{background:rgba(152,40,56,.05);border-color:var(--pyro)}.l1c-pyro .l1c-cnt{color:var(--pyro)}
@@ -91,37 +92,44 @@ footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.62rem;bord
 <!-- L1: Categorías -->
 <div class="map-l1">
   <div class="l1c l1c-pyro" data-cat="pyro" onclick="selCat('pyro')">
-    <div class="l1c-ico">🔥</div>
+    <!-- Pirometalurgia: horno / fundición -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 2.5 1.2 4.7 3 6.1V18h8v-2.9c1.8-1.4 3-3.6 3-6.1 0-4-3-7-7-7z"/><path d="M9 18v2h6v-2"/><path d="M9 11c.5-1 1.5-2 3-2s2.5 1 3 2"/></svg></div>
     <div class="l1c-name">Pirometalurgia</div>
     <div class="l1c-cnt" id="cnt-pyro">— tecs</div>
   </div>
   <div class="l1c l1c-hydro" data-cat="hydro" onclick="selCat('hydro')">
-    <div class="l1c-ico">💧</div>
+  <!-- Hidrometalurgia: matraz / proceso húmedo -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v7.5L18 18a3 3 0 0 1-2.6 4.5H8.6A3 3 0 0 1 6 18l3-7.5V3z"/><line x1="6.5" y1="14" x2="17.5" y2="14"/></svg></div>
     <div class="l1c-name">Hidrometalurgia</div>
     <div class="l1c-cnt" id="cnt-hydro">— tecs</div>
   </div>
   <div class="l1c l1c-sust" data-cat="sust" onclick="selCat('sust')">
-    <div class="l1c-ico">🌱</div>
+  <!-- Sustentabilidad: hoja + gota -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.5-4 9-8.5 9-13A9 9 0 0 0 3 9c0 4.5 3.5 9 9 13z"/><path d="M12 22V10"/><path d="M12 14l-3-3"/><path d="M12 18l3-3"/></svg></div>
     <div class="l1c-name">Sustentabilidad</div>
     <div class="l1c-cnt" id="cnt-sust">— tecs</div>
   </div>
   <div class="l1c l1c-mant" data-cat="mant" onclick="selCat('mant')">
-    <div class="l1c-ico">⚙️</div>
+  <!-- Mantenimiento: sensor / pulso predictivo -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 8 5 10 19 12 12 14 15 16 12 22 12"/></svg></div>
     <div class="l1c-name">Mantenimiento</div>
     <div class="l1c-cnt" id="cnt-mant">— tecs</div>
   </div>
   <div class="l1c l1c-mina" data-cat="mina" onclick="selCat('mina')">
-    <div class="l1c-ico">⛏️</div>
-    <div class="l1c-name">Mina</div>
+  <!-- Mina: camión autónomo -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="11" width="15" height="8" rx="1.5"/><path d="M16 14h3l3 3v2h-6v-5z"/><circle cx="5.5" cy="19.5" r="1.5"/><circle cx="18.5" cy="19.5" r="1.5"/><path d="M1 11V8a1 1 0 0 1 1-1h9l2 4"/><circle cx="9" cy="8" r=".5" fill="currentColor"/></svg></div>
+    <div class="l1c-name">Mina Autónoma</div>
     <div class="l1c-cnt" id="cnt-mina">— tecs</div>
   </div>
   <div class="l1c l1c-seg" data-cat="seg" onclick="selCat('seg')">
-    <div class="l1c-ico">🦺</div>
+  <!-- Seguridad: escudo con check -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9.7-8 11-4.5-1.3-8-6-8-11V5l8-3z"/><polyline points="9 12 11 14 15 10"/></svg></div>
     <div class="l1c-name">Seguridad</div>
     <div class="l1c-cnt" id="cnt-seg">— tecs</div>
   </div>
   <div class="l1c l1c-dig" data-cat="dig" onclick="selCat('dig')">
-    <div class="l1c-ico">📡</div>
+  <!-- Digitalización: chip / IA -->
+    <div class="l1c-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/><line x1="9" y1="7" x2="9" y2="4"/><line x1="12" y1="7" x2="12" y2="4"/><line x1="15" y1="7" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="17"/><line x1="12" y1="20" x2="12" y2="17"/><line x1="15" y1="20" x2="15" y2="17"/><line x1="7" y1="9" x2="4" y2="9"/><line x1="7" y1="12" x2="4" y2="12"/><line x1="7" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="17" y2="9"/><line x1="20" y1="12" x2="17" y2="12"/><line x1="20" y1="15" x2="17" y2="15"/></svg></div>
     <div class="l1c-name">Digitalización</div>
     <div class="l1c-cnt" id="cnt-dig">— tecs</div>
   </div>
